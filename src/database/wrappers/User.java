@@ -4,8 +4,7 @@
 // bool VerifyLogin(string UserName, string Password)
 // User (Wrapper)
 // — Variables —
-// char[32] UserID (hexadec ID) 
-// string UserName
+
 // — Methods —
 // SizedStack<FoodItem> SendFoodHistory(int start = 0, int end = 10)
 // FoodItem Class (Item Wrapper)
@@ -17,3 +16,12 @@
 
 
 package database;
+
+import db_helper.SizedStack;
+
+public class User {
+	private char[] UserID = new char[32];
+	private string Username;
+
+	public SizedStack<>
+}
