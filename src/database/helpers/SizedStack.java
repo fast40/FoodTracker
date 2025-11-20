@@ -1,4 +1,4 @@
-package db_helper;
+package database.helpers;
 
 import java.util.Stack;
 
@@ -8,7 +8,7 @@ public class SizedStack<T> extends Stack<T> {
 		this.maxSize = size;
 	}
 
-	public resize(int new_size) {
+	public void resize(int new_size) {
 		this.maxSize = new_size;
 	}
 	@Override

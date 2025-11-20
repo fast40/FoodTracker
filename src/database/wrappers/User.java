@@ -15,13 +15,18 @@
 // vector<pair<nutrientType, float>> NutritionInfo
 
 
-package database;
+package database.wrappers;
 
-import db_helper.SizedStack;
+import database.helpers.SizedStack;
 
 public class User {
 	private char[] UserID = new char[32];
-	private string Username;
+	private String Username;
 
-	public SizedStack<>
+	public SizedStack<FoodItem> GetFoodHistory() {GetFoodHistory(0, 10)}
+	public SizedStack<FoodItem> GetFoodHistory(int start, int end) {
+		SizedStack<FoodItem> history = new SizedStack<>(end - start);\
+		// TO DO
+		return history;
+	}
 }
