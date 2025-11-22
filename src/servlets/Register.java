@@ -15,4 +15,13 @@ public class Register extends HttpServlet {
 		response.setContentType("text/html;charset=UTF-8");
 		response.getWriter().println("register a new user account.");
 	}
+
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+                String username = request.getParameter("username");
+                String password = request.getParameter("password");
+
+		response.setContentType("application/json;charset=UTF-8");
+		response.getWriter().printf("{\"username\": \"%s\", \"password\": \"%s\"}\n", username, password);
+	}
 }
