@@ -1,2 +1,6 @@
 servlet-api.jar
-bin
+bin/
+
+.classpath
+.project
+.settings/
