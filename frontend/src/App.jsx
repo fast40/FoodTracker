@@ -1,13 +1,15 @@
 import { Route, Routes } from "react-router-dom";
 
 import Dashboard from "@/pages/Dashboard";
-import Test from "@/pages/Test";
+import TestFetch from "@/pages/Test";
+import AddFood from "@/pages/AddFood";
 
 function App() {
   return (
     <Routes>
-      <Route element={<Dashboard />} path="FoodTracker/" />
-      <Route element={<Test />} path="FoodTracker/test" />
+        <Route element={<Dashboard />} path="/" />
+        <Route element={<TestFetch />} path="/test" />
+        <Route element={<AddFood />} path="/add" />
     </Routes>
   );
 }

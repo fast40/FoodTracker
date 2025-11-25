@@ -9,8 +9,8 @@ import java.io.IOException;
 
 import com.google.gson.JsonObject;
 
-@WebServlet("/api/data-viz")
-public class DataViz extends HttpServlet {
+@WebServlet("/api/dashboard")
+public class Dashboard extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -18,7 +18,7 @@ public class DataViz extends HttpServlet {
 		
 		result.addProperty("success", true);
 		
-		//dummy values to test
+		//placeholder values to test
 		result.addProperty("calories", 2000);
 		result.addProperty("protein", 50);
 		result.addProperty("carbohydrates", 275);

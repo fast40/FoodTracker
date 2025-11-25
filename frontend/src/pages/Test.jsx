@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-export default function Test() {
+export default function TestFetch() {
   const [data, setData] = useState(null);
 
   async function hitBackend() {
     try {
-      const res = await fetch("http://localhost:8080/FoodTracker/api/data-viz");
+      const res = await fetch("http://localhost:8080/FoodTracker/api/dashboard");
       if (!res.ok)
         throw new Error("Request failed");
       
@@ -32,7 +32,7 @@ export default function Test() {
       <button onClick={hitBackend}>Call Servlet</button>
 
       <div style={{ marginTop: 20 }}>
-        {data && <p>Response: {data}</p>}
+        {data && <p>{data}</p>}
       </div>
     </div>
   );
