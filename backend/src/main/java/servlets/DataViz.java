@@ -14,7 +14,7 @@ public class DataViz extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		/*JsonObject result = new JsonObject();
+		JsonObject result = new JsonObject();
 		
 		result.addProperty("success", true);
 		
@@ -28,8 +28,9 @@ public class DataViz extends HttpServlet {
 		result.addProperty("sodium", 2300);
         
         response.setContentType("application/json");
-        response.getWriter().write(result.toString());*/
-		response.setContentType("text/html;charset=UTF-8");
-		response.getWriter().println("log the user in.");
+        response.getWriter().write(result.toString());
+		
+        //response.setContentType("text/html;charset=UTF-8");
+		//response.getWriter().println("show data viz page.");
 	}
 }
