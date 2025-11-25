@@ -26,9 +26,11 @@ public class Dashboard extends HttpServlet {
 		result.addProperty("sugar", 50);
 		result.addProperty("fiber", 28);
 		result.addProperty("sodium", 2300);
-        
+
+        response.setHeader("Access-Control-Allow-Origin", "*");
         response.setContentType("application/json");
         response.getWriter().write(result.toString());
+
 		
         //response.setContentType("text/html;charset=UTF-8");
 		//response.getWriter().println("show data viz page.");
