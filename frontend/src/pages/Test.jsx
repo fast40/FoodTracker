@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function App() {
+export default function Test() {
   const [data, setData] = useState(null);
 
   async function hitBackend() {
