@@ -6,11 +6,22 @@ export default function App() {
   async function hitBackend() {
     try {
       const res = await fetch("http://localhost:8080/FoodTracker/api/data-viz");
-      if (!res.ok) throw new Error("Request failed");
+      if (!res.ok)
+        throw new Error("Request failed");
+      
       const json = await res.json();
-      setData(json.message);
+      if (!res.success)
+        throw new Error("Missing data");
+
+      setData("Calories: " + json.calories +
+            "\nProtein: " + json.protein +
+            "\nCarbohydrates: " + json.carbohydrates +
+            "\nFat: " + json.fat +
+            "\nSugar: " + json.sugar +
+            "\nFiber: " + json.fiber +
+            "\nSodium: " + json.sodium);
     } catch (err) {
-      setData("Error: " + err.message);
+      setData("ERROR: " + err.message);
     }
   }
 
