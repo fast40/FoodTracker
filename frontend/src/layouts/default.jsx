@@ -1,7 +1,9 @@
 export default function DefaultLayout({ children }) {
   return (
-    <div style={{ padding: "1rem" }}>
-      {children}
+    <div className="relative flex flex-col h-screen">
+      <main className="container mx-auto max-w-7xl px-6 flex-grow pt-16">
+        {children}
+      </main>
     </div>
   );
 }
