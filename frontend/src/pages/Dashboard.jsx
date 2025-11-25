@@ -2,9 +2,8 @@
 import DefaultLayout from "@/layouts/default";
 import { useDayData } from "@/hooks/useDashboardData";
 import { useMemo, useState } from "react";
-import { Button } from "@heroui/button";
+import { Button, DatePicker } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
-import { DatePicker } from "@heroui/date-picker";
 import { parseDate } from "@internationalized/date";
 import {
   ResponsiveContainer,
@@ -19,11 +18,8 @@ import {
 import { DEFAULT_DV } from "@/data/dv";
 import { UNITS } from "@/data/units";
 
-
 export default function Dashboard() {
-  const [date, setDate] = useState(
-    new Date().toISOString().slice(0, 10)
-  );
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   // Memorize Date instance so useDayData's effect doesn't re-run every render
   const dayDate = useMemo(() => new Date(date), [date]);
   const { totals: _totals, entries } = useDayData(dayDate);
@@ -63,9 +59,7 @@ export default function Dashboard() {
 
   // Build stacked data rows: one row per nutrient, columns per food id with %DV values
   const data = useMemo(() => {
-    const rows = nutrients.map(
-      (n) => ({ name: n.label, nutrientKey: n.key })
-    );
+    const rows = nutrients.map((n) => ({ name: n.label, nutrientKey: n.key }));
     (entries || []).map((e, i) => {
       const foodId = foods[i]?.id;
       if (!foodId) return;
