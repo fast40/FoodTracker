@@ -5,7 +5,7 @@ export default function TestFetch() {
 
   async function hitBackend() {
     try {
-      const res = await fetch("http://localhost:8080/FoodTracker/api/dashboard");
+      const res = await fetch("http://localhost:8080/food-tracker/api/dashboard");
       if (!res.ok)
         throw new Error("Request failed");
       

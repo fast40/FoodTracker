@@ -27,7 +27,6 @@ public class Dashboard extends HttpServlet {
 		result.addProperty("fiber", 28);
 		result.addProperty("sodium", 2300);
 
-        response.setHeader("Access-Control-Allow-Origin", "*");
         response.setContentType("application/json");
         response.getWriter().write(result.toString());
 
