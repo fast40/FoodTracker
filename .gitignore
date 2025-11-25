@@ -1,9 +1,0 @@
-servlet-api.jar
-bin/
-
-.classpath
-.project
-.settings/
-
-META-INF/
-WEB-INF/
