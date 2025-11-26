@@ -19,13 +19,13 @@ public class Dashboard extends HttpServlet {
 		result.addProperty("success", true);
 		
 		//placeholder values to test
-		result.addProperty("calories", 2000);
-		result.addProperty("protein", 50);
-		result.addProperty("carbohydrates", 275);
-		result.addProperty("fat", 78);
-		result.addProperty("sugar", 50);
-		result.addProperty("fiber", 28);
-		result.addProperty("sodium", 2300);
+		result.addProperty("calories", 800);
+		result.addProperty("protein", 30);
+		result.addProperty("carbohydrates", 222);
+		result.addProperty("fat", 14);
+		result.addProperty("sugar", 22);
+		result.addProperty("fiber", 12);
+		result.addProperty("sodium", 1200);
 
         response.setContentType("application/json");
         response.getWriter().write(result.toString());

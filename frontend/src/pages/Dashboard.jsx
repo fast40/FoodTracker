@@ -1,6 +1,7 @@
 /* eslint-disable */
 import DefaultLayout from "@/layouts/default";
-import { useDayData } from "@/hooks/useDashboardData";
+import { useDayData } from "@/hooks/dashboardData";
+import { useTestData } from "@/hooks/dashboardData";
 import { useMemo, useState } from "react";
 import { Button } from "@heroui/button";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +27,14 @@ export default function Dashboard() {
   );
   // Memorize Date instance so useDayData's effect doesn't re-run every render
   const dayDate = useMemo(() => new Date(date), [date]);
-  const { totals: _totals, entries } = useDayData(dayDate);
+
+  // Get nutrient data via the dashboardData hook
+  // - Use useDayData() to fetch from tomcat server
+  // - Use useTestData() for local placeholder values
+  const dayData = useDayData(dayDate);
+  const entries = dayData ? dayData.entries : [];
+  const _totals = dayData ? dayData.totals : null;
+
   const navigate = useNavigate();
 
   // Nutrient categories (bars on X-axis)
