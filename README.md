@@ -10,7 +10,9 @@ Welcome to the VS Code Java world. Here is a guideline to help you get started t
 > Update: the backend has been migrated to use Maven.
 
 1. Install Maven. On MacOS, if you have homebrew, simply run `brew install maven`.
-2. To build and run:
+2. Get an USDA Food API Key at https://fdc.nal.usda.gov/api-guide
+3. Create. a copy of `backend/.env.example` and rename it to `.env`, then put your API key in there.
+4. To build and run:
 
 ```sh
 cd backend

@@ -1,50 +1,56 @@
 package database.wrappers;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FoodItem {
-	// TO DO - Finish this
-	public static enum NutrientType {
-		CALORIES,
-		trans_fat, saturated_fat,
-		A, B1, B2, B3, B5, B6, B7, B9, B12, C, D, D2, D3, E, K,
-		calcium, iron, potassium,
-		CHOLESTEROL,
-		SODIUM,
-		PROTEIN,
-		total_sugar, added_sugar, dietary_fiber;
+    private Integer foodId; // Database ID
+    private Integer fdcId; // USDA ID
+    private String description;
+    private String dataType; // 'Branded', 'Foundation', etc.
+    private String brandOwner;
+    private String gtinUpc;
+    private Float servingSize;
+    private String servingSizeUnit;
+    private String householdServingFullText;
+    private List<Nutrient> nutrients = new ArrayList<>();
 
-		public static final EnumSet<NutrientType> FAT = EnumSet.of(trans_fat, saturated_fat);
-		public static final EnumSet<NutrientType> VITAMINS = EnumSet.of(A, B1, B1, B2, B3, B5, B6, B7, B9, B12, C, D, D2, D3, E, K);
-		public static final EnumSet<NutrientType> MINERALS = EnumSet.of(calcium, iron, potassium);
-		public static final EnumSet<NutrientType> CARBOHYDRATES = EnumSet.of(total_sugar, added_sugar, dietary_fiber);
-	}
-	// Member Variables
-	// I preface my private members with "m" out of habit from another class
-	// - Sid
-	private char[] mItemID = new char[32];
-	private char[] mOwnerID = new char[32];
-	private String mName;
-	private Map<NutrientType, Float> mNutrients = new HashMap<>();
+    public FoodItem() {}
 
-	// Functions
-	public FoodItem(String name, char[] foodID, char[] ownerID) {
-		mName = name;
-		mItemID = foodID;
-		mOwnerID = ownerID;
-	}
-	public void SetName(String newName){
-		mName = newName;
-	}
-	public String GetName() {return mName;}
+    public FoodItem(String description, String gtinUpc) {
+        this.description = description;
+        this.gtinUpc = gtinUpc;
+    }
 
-	// Helper Functions
-	private boolean PullNutrientData() {
-		// return true on successfully pulling data from database else false
-		// TO DO
-		return false;
-	}
+    // Getters and Setters
+    public Integer getFoodId() { return foodId; }
+    public void setFoodId(Integer foodId) { this.foodId = foodId; }
 
+    public Integer getFdcId() { return fdcId; }
+    public void setFdcId(Integer fdcId) { this.fdcId = fdcId; }
 
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getDataType() { return dataType; }
+    public void setDataType(String dataType) { this.dataType = dataType; }
+
+    public String getBrandOwner() { return brandOwner; }
+    public void setBrandOwner(String brandOwner) { this.brandOwner = brandOwner; }
+
+    public String getGtinUpc() { return gtinUpc; }
+    public void setGtinUpc(String gtinUpc) { this.gtinUpc = gtinUpc; }
+
+    public Float getServingSize() { return servingSize; }
+    public void setServingSize(Float servingSize) { this.servingSize = servingSize; }
+
+    public String getServingSizeUnit() { return servingSizeUnit; }
+    public void setServingSizeUnit(String servingSizeUnit) { this.servingSizeUnit = servingSizeUnit; }
+
+    public String getHouseholdServingFullText() { return householdServingFullText; }
+    public void setHouseholdServingFullText(String householdServingFullText) { this.householdServingFullText = householdServingFullText; }
+
+    public List<Nutrient> getNutrients() { return nutrients; }
+    public void setNutrients(List<Nutrient> nutrients) { this.nutrients = nutrients; }
+    public void addNutrient(Nutrient nutrient) { this.nutrients.add(nutrient); }
 }

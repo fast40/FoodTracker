@@ -1,37 +1,10 @@
--- User Generated Data
-
-CREATE TABLE food_data (
-    food_id INT UNIQUE PRIMARY KEY NOT NULL,
-    created_by INT DEFAULT NULL, -- UserID
-    calories INT DEFAULT 0,
-    total_fat INT DEFAULT 0,
-    trans_fat INT DEFAULT 0,
-    saturated_fat INT DEFAULT 0,
-    vitamin_a INT DEFAULT 0,
-    vitamin_b1 INT DEFAULT 0,
-    vitamin_b2 INT DEFAULT 0,
-    vitamin_b3 INT DEFAULT 0,
-    vitamin_b5 INT DEFAULT 0,
-    vitamin_b6 INT DEFAULT 0,
-    vitamin_b7 INT DEFAULT 0,
-    vitamin_b9 INT DEFAULT 0,
-    vitamin_b12 INT DEFAULT 0,
-    vitamin_c INT DEFAULT 0,
-    vitamin_d INT DEFAULT 0,
-    vitamin_d2 INT DEFAULT 0,
-    vitamin_d3 INT DEFAULT 0,
-    vitamin_e INT DEFAULT 0,
-    vitamin_k INT DEFAULT 0,
-    calcium INT DEFAULT 0,
-    iron INT DEFAULT 0,
-    potassium INT DEFAULT 0,
-    cholesterol INT DEFAULT 0,
-    sodium INT DEFAULT 0,
-    protein INT DEFAULT 0,
-    total_sugar INT DEFAULT 0,
-    added_sugar INT DEFAULT 0,
-    dietary_fiber INT DEFAULT 0,
-
-    FOREIGN KEY (food_id) REFERENCES food_item(food_id) ON DELETE CASCADE,
-    FOREIGN KEY (created_by) REFERENCES user_db(user_id) ON DELETE SET NULL,
-)
+CREATE TABLE food_nutrient_values (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    food_id INT NOT NULL,
+    nutrient_id INT NOT NULL,
+    amount FLOAT NOT NULL,
+    
+    FOREIGN KEY (food_id) REFERENCES food_items(food_id) ON DELETE CASCADE,
+    FOREIGN KEY (nutrient_id) REFERENCES nutrient_definitions(nutrient_id) ON DELETE CASCADE,
+    UNIQUE(food_id, nutrient_id)
+);

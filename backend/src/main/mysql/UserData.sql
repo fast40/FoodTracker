@@ -1,10 +1,9 @@
-CREATE TABLE user_data (
+CREATE TABLE user_preferences (
     user_id INT PRIMARY KEY,
     dark_mode BOOLEAN DEFAULT FALSE,
     notifications_enabled BOOLEAN DEFAULT FALSE,
-    language VARCHAR[10] DEFAULT 'EN',
-
+    language_code VARCHAR(10) DEFAULT 'en-US',
     show_calories BOOLEAN DEFAULT TRUE,
-
-    FOREIGN KEY user_id REFERENCES user_db(user_id) ON DELETE CASCADE
-)
+    daily_calorie_goal INT DEFAULT 2000,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);

@@ -1,6 +1,7 @@
-CREATE TABLE user_db (
-    user_id INT UNIQUE PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR[64] UNIQUE, -- arbitrary char limit
-    email VARCHAR[320] UNIQUE,
-    hashed_pw VARCHAR[255]
-)
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(64) NOT NULL UNIQUE,
+    email VARCHAR(320) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
