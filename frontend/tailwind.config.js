@@ -20,7 +20,7 @@ export default {
         content4: "#333333",
 
         primary: {
-          DEFAULT: "#7471b3ff",
+          DEFAULT: "#9692deff",
           foreground: "#000000",
         },
       },

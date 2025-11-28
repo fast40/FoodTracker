@@ -61,23 +61,6 @@ export default function Dashboard() {
     "#60a344ff",
     "#7a4628ff",
   ];
-  /*const palette = [
-    "#5b588f",
-    "#258387",
-    "#4b7f2fff",
-    "#7a4628ff",
-  ];*/
-  /*const palette = [
-    "#6366f1",
-    "#10b981",
-    "#f59e0b",
-    "#ef4444",
-    "#14b8a6",
-    "#3b82f6",
-    "#8b5cf6",
-    "#ec4899",
-    "#22d3ee",
-  ];*/
   const foods = (entries || []).map((e, i) => ({
     id: e.id || String(i),
     name: e.name,
