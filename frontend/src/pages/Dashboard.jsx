@@ -29,9 +29,9 @@ export default function Dashboard() {
   const dayDate = useMemo(() => new Date(date), [date]);
 
   // Get nutrient data via the dashboardData hook
-  // - Use useDayData() to fetch from tomcat server
-  // - Use useTestData() for local placeholder values
-  const dayData = useDayData(dayDate);
+  // - useDayData() to fetch from tomcat server
+  // - useTestData() for local placeholder values
+  const dayData = useTestData(dayDate);
   const entries = dayData ? dayData.entries : [];
   const _totals = dayData ? dayData.totals : null;
 
@@ -52,7 +52,22 @@ export default function Dashboard() {
   );
 
   // Color palette and per-food mapping
+
   const palette = [
+    "#7471b3ff",
+    "#2c3772ff",
+    "#4e9cb1ff",
+    "#6bd1a5ff",
+    "#60a344ff",
+    "#7a4628ff",
+  ];
+  /*const palette = [
+    "#5b588f",
+    "#258387",
+    "#4b7f2fff",
+    "#7a4628ff",
+  ];*/
+  /*const palette = [
     "#6366f1",
     "#10b981",
     "#f59e0b",
@@ -62,7 +77,7 @@ export default function Dashboard() {
     "#8b5cf6",
     "#ec4899",
     "#22d3ee",
-  ];
+  ];*/
   const foods = (entries || []).map((e, i) => ({
     id: e.id || String(i),
     name: e.name,
@@ -139,21 +154,21 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="w-full">
-          <ResponsiveContainer width="100%" height={360}>
+          <ResponsiveContainer width="100%" height={600}>
             <BarChart
               data={data}
-              margin={{ top: 20, right: 0, left: 0, bottom: 8 }}
+              margin={{ top: 20, right: 0, left: -30, bottom: 8 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis
                 domain={[0, 100]}
                 tickFormatter={(v) => `${v}%`}
-                width={50}
+                width={110}
                 label={{
                   value: "Daily Value (%)",
                   angle: -90,
-                  position: "insideLeft",
+                  position: "center",
                 }}
               />
               <Tooltip content={<ValueTooltip />} />
