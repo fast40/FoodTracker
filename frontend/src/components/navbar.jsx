@@ -43,7 +43,7 @@ export const Navbar = () => {
             href="/"
           >
             {/* <Logo /> */}
-            <p className="font-bold">Clolo</p>
+            <p className="font-bold">FoodTracker</p>
           </Link>
         </NavbarBrand>
         <div className="hidden lg:flex gap-4 justify-start ml-2">
