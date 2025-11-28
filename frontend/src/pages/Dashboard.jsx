@@ -1,6 +1,7 @@
 /* eslint-disable */
 import DefaultLayout from "@/layouts/default";
-import { useDayData } from "@/hooks/useDashboardData";
+import { useDayData } from "@/hooks/dashboardData";
+import { useTestData } from "@/hooks/dashboardData";
 import { useMemo, useState } from "react";
 import { Button, DatePicker } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +23,14 @@ export default function Dashboard() {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   // Memorize Date instance so useDayData's effect doesn't re-run every render
   const dayDate = useMemo(() => new Date(date), [date]);
-  const { totals: _totals, entries } = useDayData(dayDate);
+
+  // Get nutrient data via the dashboardData hook
+  // - useDayData() to fetch from tomcat server
+  // - useTestData() for local placeholder values
+  const dayData = useTestData(dayDate);
+  const entries = dayData ? dayData.entries : [];
+  const _totals = dayData ? dayData.totals : null;
+
   const navigate = useNavigate();
 
   // Nutrient categories (bars on X-axis)
@@ -40,16 +48,14 @@ export default function Dashboard() {
   );
 
   // Color palette and per-food mapping
+
   const palette = [
-    "#6366f1",
-    "#10b981",
-    "#f59e0b",
-    "#ef4444",
-    "#14b8a6",
-    "#3b82f6",
-    "#8b5cf6",
-    "#ec4899",
-    "#22d3ee",
+    "#7471b3ff",
+    "#2c3772ff",
+    "#4e9cb1ff",
+    "#6bd1a5ff",
+    "#60a344ff",
+    "#7a4628ff",
   ];
   const foods = (entries || []).map((e, i) => ({
     id: e.id || String(i),
@@ -125,21 +131,21 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="w-full">
-          <ResponsiveContainer width="100%" height={360}>
+          <ResponsiveContainer width="100%" height={600}>
             <BarChart
               data={data}
-              margin={{ top: 20, right: 0, left: 0, bottom: 8 }}
+              margin={{ top: 20, right: 0, left: -30, bottom: 8 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis
                 domain={[0, 100]}
                 tickFormatter={(v) => `${v}%`}
-                width={50}
+                width={110}
                 label={{
                   value: "Daily Value (%)",
                   angle: -90,
-                  position: "insideLeft",
+                  position: "center",
                 }}
               />
               <Tooltip content={<ValueTooltip />} />
