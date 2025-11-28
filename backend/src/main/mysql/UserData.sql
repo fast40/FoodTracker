@@ -4,5 +4,7 @@ CREATE TABLE user_data (
     notifications_enabled BOOLEAN DEFAULT FALSE,
     language VARCHAR[10] DEFAULT 'EN',
 
-    show_calories BOOLEAN DEFAULT TRUE
+    show_calories BOOLEAN DEFAULT TRUE,
+
+    FOREIGN KEY user_id REFERENCES user_db(user_id) ON DELETE CASCADE
 )

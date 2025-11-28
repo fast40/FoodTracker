@@ -2,7 +2,7 @@
 
 CREATE TABLE food_data (
     food_id INT UNIQUE PRIMARY KEY NOT NULL,
-    created_by INT FOREIGN KEY DEFAULT NULL, -- UserID
+    created_by INT DEFAULT NULL, -- UserID
     calories INT DEFAULT 0,
     total_fat INT DEFAULT 0,
     trans_fat INT DEFAULT 0,
@@ -30,5 +30,8 @@ CREATE TABLE food_data (
     protein INT DEFAULT 0,
     total_sugar INT DEFAULT 0,
     added_sugar INT DEFAULT 0,
-    dietary_fiber INT DEFAULT 0
+    dietary_fiber INT DEFAULT 0,
+
+    FOREIGN KEY (food_id) REFERENCES food_item(food_id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES user_db(user_id) ON DELETE SET NULL,
 )

@@ -1,4 +1,4 @@
-CREATE TABLE user (
+CREATE TABLE user_db (
     user_id INT UNIQUE PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR[64] UNIQUE, -- arbitrary char limit
     email VARCHAR[320] UNIQUE,
