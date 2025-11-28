@@ -16,13 +16,12 @@ import com.google.gson.JsonParser;
 
 import database.wrappers.FoodItem;
 import database.wrappers.Nutrient;
-
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class USDAFoodAPI {
     private static String apiKey;
     private static final String BASE_URL = "https://api.nal.usda.gov/fdc/v1";
-    private static final HttpClient client = HttpClient.newHttpClient();
+    private static HttpClient client = HttpClient.newHttpClient();
 
     static {
         // Try to load from .env file first
@@ -46,6 +45,10 @@ public class USDAFoodAPI {
 
     public static void setApiKey(String key) {
         apiKey = key;
+    }
+
+    public static void setHttpClient(HttpClient httpClient) {
+        client = httpClient;
     }
 
     public static FoodItem fetchFoodByGTIN(String gtinUpc) throws Exception {

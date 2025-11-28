@@ -21,6 +21,13 @@ mvn package cargo:run
 
 The project will be running at http://localhost:8080/food-tracker/
 
+### Testing
+
+```sh
+cd backend
+mvn test
+```
+
 ### TODO
 
 - [ ] Integrate the front end. Build the front end and copy the output during maven build.
