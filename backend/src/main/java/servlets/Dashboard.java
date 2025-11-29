@@ -18,6 +18,11 @@ public class Dashboard extends HttpServlet {
 		
 		result.addProperty("success", true);
 		
+		//TODO: read start date and end date from request
+		
+		//TODO: query database for data
+		
+		//TODO: construct a list of days, each with a list of foods (instead of returning via properties)
 		//placeholder values to test
 		result.addProperty("calories", 800);
 		result.addProperty("protein", 30);
