@@ -15,9 +15,11 @@ public class Nutrient {
         this.unitName = unitName;
     }
 
+    // Setters / Getters
     public int getNutrientId() { return nutrientId; }
     public String getName() { return name; }
     public String getNumber() { return number; }
+    public void setNutrientNumber(String nutrient) {number = nutrient;}
     public float getAmount() { return amount; }
     public String getUnitName() { return unitName; }
 }

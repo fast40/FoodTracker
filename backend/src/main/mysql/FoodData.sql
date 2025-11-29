@@ -1,3 +1,4 @@
+--Custom Foods (User Generated)
 CREATE TABLE food_nutrient_values (
     id INT AUTO_INCREMENT PRIMARY KEY,
     food_id INT NOT NULL,

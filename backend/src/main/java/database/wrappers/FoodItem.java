@@ -13,6 +13,7 @@ public class FoodItem {
     private Float servingSize;
     private String servingSizeUnit;
     private String householdServingFullText;
+    private Integer createdBy;
     private List<Nutrient> nutrients = new ArrayList<>();
 
     public FoodItem() {}
@@ -49,6 +50,9 @@ public class FoodItem {
 
     public String getHouseholdServingFullText() { return householdServingFullText; }
     public void setHouseholdServingFullText(String householdServingFullText) { this.householdServingFullText = householdServingFullText; }
+
+    public Integer getCreatorID() { return this.createdBy; }
+    public void setCreatorID(Integer creator) {this.createdBy = creator; }
 
     public List<Nutrient> getNutrients() { return nutrients; }
     public void setNutrients(List<Nutrient> nutrients) { this.nutrients = nutrients; }

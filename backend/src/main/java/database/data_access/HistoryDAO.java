@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class FoodHistoryDAO {
+public class HistoryDAO {
     private static Integer PER_PAGE = 32;
     // defaulting to breakfast, add an option of not included
     public boolean AddToHistory(int user_id, int food_id) {return AddToHistory(user_id, food_id, 1, Enumerations.MealType.BREAKFAST); }
