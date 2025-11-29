@@ -19,6 +19,9 @@ import {
 import { DEFAULT_DV } from "@/data/dv";
 import { UNITS } from "@/data/units";
 
+
+//TODO: turn diff views into components, use them in this file
+
 export default function Dashboard() {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   // Memorize Date instance so useDayData's effect doesn't re-run every render
@@ -48,7 +51,6 @@ export default function Dashboard() {
   );
 
   // Color palette and per-food mapping
-
   const palette = [
     "#7471b3ff",
     "#2c3772ff",

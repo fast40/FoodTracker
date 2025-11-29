@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-// Fetches from the /api/dashboard servlet to get totals for a given day
-// - currently does not use the dayDate parameter
+// Fetches from the /api/dashboard servlet to get values for a given day
+// @return: list of foods, each with nutrient values, name, and servings
 export function useDayData(dayDate) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -10,6 +10,7 @@ export function useDayData(dayDate) {
   useEffect(() => {
     async function load() {
       try {
+        //TODO: add dayDat to request
         const res = await fetch("http://localhost:8080/food-tracker/api/dashboard");
         if (!res.ok)
           throw new Error("Request failed");
@@ -49,6 +50,14 @@ export function useDayData(dayDate) {
   return data;
 }
 
+
+// Fetches from the /api/dashboard servlet to get values for a given date range (week or month)
+// @return: list of days (each has foods, each with nutrient values, name, and servings)
+export function useRangeData(startDate, endDate) {
+  
+}
+
+
 // Returns placeholder data for testing purposes
 export function useTestData() {
   return {
@@ -85,7 +94,7 @@ export function useTestData() {
       {
         id: "3",
         name: "Sample Food C",
-        consumed: { servings: 1 },
+        consumed: { servings: 5 },
         nutrients: {
           energy_kcal: 90,
           protein_g: 2,
