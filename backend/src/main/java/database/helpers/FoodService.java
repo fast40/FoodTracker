@@ -12,5 +12,5 @@ public class FoodService {
         this.food_dao = new FoodDAO();
     }
 
-    public List<FoodItem> search
+    public List<FoodItem> search;
 }
