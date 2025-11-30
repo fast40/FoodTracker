@@ -36,10 +36,8 @@ const NUTRIENT_FIELDS =
 const API_BASE = "http://localhost:8080/FoodTracker";
 
 
-//AddFood function
 export default function AddFood() 
 {
-
   //need a variable to navigate
   const navigate = useNavigate();
 
@@ -103,9 +101,8 @@ export default function AddFood()
         throw new Error(`HTTP ${res.status}`);
       }
 
-
       //If success, go back to the dashboard so the user can see the updated charts (after the backend reads from DB).
-      navigate("/FoodTracker");
+      navigate("/dashboard");
     } catch (err) {
       //show a readable error message on the page
       setError(err instanceof Error ? err.message : String(err));
@@ -250,7 +247,7 @@ export default function AddFood()
             {/* Cancel just goes back to the dashboard without saving */}
             <Button
               variant="bordered"
-              onPress={() => navigate("/FoodTracker")}
+              onPress={() => navigate("/dashboard")}
               disabled={saving}
             >
               Cancel

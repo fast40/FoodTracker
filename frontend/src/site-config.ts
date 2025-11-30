@@ -1,7 +1,7 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Clolo",
+  name: "FoodTracker",
   description: "Track daily nutrients with barcode scans and charts.",
   navItems: [
     {
