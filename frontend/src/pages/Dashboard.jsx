@@ -127,7 +127,7 @@ export default function Dashboard() {
               value={parseDate(date)}
               onChange={(v) => v && setDate(v.toString())}
             />
-            <Button color="primary" onPress={() => navigate("/add")}>
+            <Button color="primary" onPress={() => navigate("/add")} style={{ color: "white" }}>
               Add Food
             </Button>
           </div>

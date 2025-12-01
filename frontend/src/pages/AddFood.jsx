@@ -254,7 +254,7 @@ export default function AddFood()
             </Button>
 
             {/* Submit triggers handleSubmit() above */}
-            <Button color="primary" type="submit" isDisabled={saving}>
+            <Button color="primary" style={{ color: "white" }} type="submit" isDisabled={saving}>
               {saving ? "Saving…" : "Save Food"}
             </Button>
           </div>
