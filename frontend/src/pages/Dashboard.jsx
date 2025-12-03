@@ -13,6 +13,8 @@ export default function Dashboard() {
 
   return (
     <DefaultLayout>
+      {/*<h1 className="text-2xl font-semibold">Dashboard</h1>*/}
+
       <Button
         onClick={() => setView("day")}
         color = {view === "day" ? "primary" : "default"}

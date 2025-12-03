@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@heroui/button";
 
 //units map so user can label the inputs with (g, mg, kcal…)
-import { UNITS } from "@/data/units";
+import { UNITS } from "@/data";
 
 
 //nutrients the user can type in on this form (should be the same in all files):
