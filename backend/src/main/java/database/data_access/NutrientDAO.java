@@ -24,6 +24,7 @@ public class NutrientDAO {
         }
         return false;
     }
+
     public List<Nutrient> getCustomNutrients(int food_id) {
         List<Nutrient> nutrients = new ArrayList<>();
 
@@ -49,4 +50,9 @@ public class NutrientDAO {
         return nutrients;
     }
 
+    public List<Nutrient> getNutrientsFromAPI(int fdc_id) {
+        List<Nutrient> nutrients = new ArrayList<>();
+
+        return nutrients;
+    }
 }

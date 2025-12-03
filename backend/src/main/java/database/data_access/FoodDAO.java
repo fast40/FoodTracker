@@ -26,7 +26,7 @@ public class FoodDAO {
                 food.setDescription(rs.getString("description"));
                 food.setDataType(rs.getString("data_type"));
                 food.setBrandOwner(rs.getString("brand_owner"));
-                food.setGtinUpc(rs.getString("stin_upc"));
+                food.setGtinUpc(rs.getString("gtin_upc"));
                 food.setServingSize(rs.getFloat("serving_size"));
                 food.setServingSizeUnit(rs.getString("serving_size_unit"));
                 food.setHouseholdServingFullText(rs.getString("household_serving_full_text"));
@@ -42,6 +42,39 @@ public class FoodDAO {
         return null;
     }
 
+    public FoodItem getFoodByGTIN(String gtin) {
+        String query = "SELECT * FROM food_items WHERE food_gtin = ?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, gtin);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                FoodItem food = new FoodItem();
+                food.setFoodId(rs.getInt("food_id"));
+
+                Integer fdc_id = rs.getObject("fdc_id", Integer.class);
+                food.setFdcId(fdc_id);
+
+                food.setDescription(rs.getString("description"));
+                food.setDataType(rs.getString("data_type"));
+                food.setBrandOwner(rs.getString("brand_owner"));
+                food.setGtinUpc(rs.getString("gtin_upc"));
+                food.setServingSize(rs.getFloat("serving_size"));
+                food.setServingSizeUnit(rs.getString("serving_size_unit"));
+                food.setHouseholdServingFullText(rs.getString("household_serving_full_text"));
+
+                Integer createdBy = rs.getObject("created_by", Integer.class);
+                food.setCreatorID(createdBy);
+
+                return food;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
     public List<FoodItem> searchFoods(String search_query) {
         List<FoodItem> foods = new ArrayList<>();
         String sql_query = "SELECT * FROM food_items WHERE description LIKE ? " + " OR brand_owner LIKE ? LIMIT 50";
@@ -54,12 +87,12 @@ public class FoodDAO {
             ResultSet rs = stmt.executeQuery();
 
             // possible runaway while loop, maybe limit scope
-            while(rs.next()) {
+            while (rs.next()) {
                 FoodItem food = new FoodItem();
                 food.setDescription(rs.getString("description"));
                 food.setDataType(rs.getString("data_type"));
                 food.setBrandOwner(rs.getString("brand_owner"));
-                food.setGtinUpc(rs.getString("stin_upc"));
+                food.setGtinUpc(rs.getString("gtin_upc"));
                 food.setServingSize(rs.getFloat("serving_size"));
                 food.setServingSizeUnit(rs.getString("serving_size_unit"));
                 food.setHouseholdServingFullText(rs.getString("household_serving_full_text"));
