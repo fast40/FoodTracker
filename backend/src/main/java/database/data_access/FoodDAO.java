@@ -1,6 +1,8 @@
 package database.data_access;
 
+import database.helpers.Enumerations;
 import database.wrappers.FoodItem;
+import database.wrappers.Nutrient;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -50,7 +52,8 @@ public class FoodDAO {
 
             if (rs.next()) {
                 FoodItem food = new FoodItem();
-                food.setFoodId(rs.getInt("food_id"));
+                Integer food_id = rs.getInt("food_id");
+                food.setFoodId(food_id);
 
                 Integer fdc_id = rs.getObject("fdc_id", Integer.class);
                 food.setFdcId(fdc_id);
@@ -63,10 +66,10 @@ public class FoodDAO {
                 food.setServingSizeUnit(rs.getString("serving_size_unit"));
                 food.setHouseholdServingFullText(rs.getString("household_serving_full_text"));
 
+                food.setNutrients(GetNutrients(food_id));
+
                 Integer createdBy = rs.getObject("created_by", Integer.class);
                 food.setCreatorID(createdBy);
-
-                return food;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -143,6 +146,29 @@ public class FoodDAO {
 
             if (rs.next()) {
                 return rs.getInt("food_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private List<Nutrient> GetNutrients(Integer food_id) {
+        String  query = "SELECT * FROM food_nutrient_values WHERE food_id = ?";
+        List<Nutrient> nutrients = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, food_id);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Integer nutrientID = rs.getInt("nutrient_id");
+                String name  = Enumerations.NutrientType.values()[nutrientID].getName();
+                // nutrient number is being ignored right now becuase I dont want to do a third lookup
+                String nutrientNumber = "";
+                Float amount = rs.getFloat("amount");
+                String unitName = rs.getString("unit_name");
+
+                Nutrient nutrient = new Nutrient(nutrientID, name, nutrientNumber, amount, unitName);
+                nutrients.add(nutrient);
             }
         } catch (SQLException e) {
             e.printStackTrace();
