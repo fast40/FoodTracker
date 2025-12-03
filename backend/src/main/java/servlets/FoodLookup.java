@@ -40,28 +40,18 @@ public class FoodLookup extends HttpServlet {
         try {
             FoodItem foodItem = null;
 
-            // TODO: Database Lookup (Commented out as DB is not set up)
-            /*
-            // GTIN = barcode
             // Check if food exists in our DB first to avoid API call
-
-            foodItem = FoodDatabaseHelper.getFoodByGTIN(gtin);
+            foodItem = foodDAO.getFoodByGTIN(gtin);
             if (foodItem != null) {
                 out.print(gson.toJson(foodItem));
                 return;
             }
-            */
-
 
             // API Lookup
             foodItem = USDAFoodAPI.fetchFoodByGTIN(gtin);
 
             if (foodItem != null) {
-                // TODO: Save to Database (Commented out as DB is not set up)
-                /*
-                // Cache the result in our DB for future lookups
-                FoodDatabaseHelper.saveFoodItem(foodItem);
-                */
+                foodDAO.insertFoodItem(foodItem);
 
                 out.print(gson.toJson(foodItem));
             } else {

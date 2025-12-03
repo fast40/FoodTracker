@@ -19,8 +19,11 @@ public class Enumerations {
         public String GetName() {
             return this.sql_string;
         }
+
         public int GetID() {
             return this.sql_code;
         }
     }
+
+    // TODO - add enumeration connecting NutrientIDs
 }
