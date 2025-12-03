@@ -1,6 +1,10 @@
 package servlets;
 
+import database.data_access.FoodDAO;
 import database.data_access.HistoryDAO;
+import database.data_transfer.DailyFoodLog;
+import database.data_transfer.LogEntry;
+import database.wrappers.FoodItem;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +16,9 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.sql.Timestamp;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
 
 import com.google.gson.JsonObject;
 
@@ -22,9 +28,11 @@ public class Dashboard extends HttpServlet {
     final String endRequest = "end"; // TODO - This one too
     final String userIDRequest = "userID";
     final String entryLimitRequest = "entryLimit";
+    final String timezoneRequest = "timezone";
 
     private Gson gson = new Gson();
     private HistoryDAO historyDAO = new HistoryDAO();
+    private FoodDAO foodDAO = new FoodDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -36,11 +44,12 @@ public class Dashboard extends HttpServlet {
         JsonObject result = new JsonObject();
         PrintWriter out = response.getWriter();
 
-
+        // @ Ian :D
         /* request schema
             UserID // Integer -- this can be changed to something else but we'd have to do a 2nd table lookup
             start timestamp // ISO 8601 Standard
             end timestamp // ISO 8601 Standard
+            timezone // IANA timezone identifier
          */
 
         result.addProperty("success", true); // why is this here so early -sid
@@ -63,20 +72,34 @@ public class Dashboard extends HttpServlet {
         Integer userID = Integer.parseInt(request.getParameter(userIDRequest));
 
         String limitParam = request.getParameter(entryLimitRequest);
+        String tzParam = request.getParameter(timezoneRequest);
+        ZoneId userZone = (tzParam != null) ? ZoneId.of(tzParam) : ZoneId.of("UTC");
+
+
+        List<LogEntry> history;
         Integer entryLimit = (limitParam != null) ? Integer.parseInt(limitParam) : 100;
         try {
-            List<Integer> history = historyDAO.GetHistory(userID, mysql_start, mysql_end, entryLimit);
-            out.write(gson.toJson(history));
+            history = historyDAO.GetHistory(userID, mysql_start, mysql_end, entryLimit);
+            Map<LocalDate, DailyFoodLog> dailyFoodLog = new LinkedHashMap<>();
+
+            for (LogEntry log : history)  {
+                FoodItem item = foodDAO.getFoodById(log.foodId());
+                LocalDate localDate = log.date().toInstant().atZone(userZone).toLocalDate();
+                dailyFoodLog.computeIfAbsent(localDate, date -> new DailyFoodLog(date.toString())).addFood(item);
+            }
+
+            List<DailyFoodLog> dailyHistory = new ArrayList<>(dailyFoodLog.values());
+            String json = gson.toJson(dailyHistory);
+            out.write(json);
+
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"error\": \"Database error\"}");
+            out.write("{\"error\": \"Database error\"}");
         }
 
-
-        //TODO: construct a list of days, each with a list of foods (instead of returning via properties)
         //placeholder values to test but the values should be listed generically in nested json objects
-        // Im leaving this here for you to test
+        /*
         result.addProperty("calories", 800);
         result.addProperty("protein", 30);
         result.addProperty("carbohydrates", 222);
@@ -87,6 +110,7 @@ public class Dashboard extends HttpServlet {
 
         response.setContentType("application/json");
         response.getWriter().write(result.toString());
+        */
 
 
         //response.setContentType("text/html;charset=UTF-8");

@@ -1,8 +1,9 @@
 package database.data_access;
 
+import com.mysql.cj.log.Log;
+import database.data_transfer.LogEntry;
 import database.helpers.Enumerations;
 
-import javax.print.PrintException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +36,12 @@ public class HistoryDAO {
         }
     }
 
-    public List<Integer> GetHistory(Integer UserID, Timestamp start, Timestamp end) throws SQLException {
+    public List<LogEntry> GetHistory(Integer UserID, Timestamp start, Timestamp end) throws SQLException {
         return GetHistory(UserID, start, end, 100);
     }
 
-    public List<Integer> GetHistory(Integer UserID, Timestamp start, Timestamp end, Integer limit) throws SQLException {
-        List<Integer> history = new ArrayList<>();
+    public List<LogEntry> GetHistory(Integer UserID, Timestamp start, Timestamp end, Integer limit) throws SQLException {
+        List<LogEntry> history = new ArrayList<>();
         String query = "SELECT * FROM food_logs WHERE user_id = ? AND log_date BETWEEN ? AND ? ORDER BY log_date DESC LIMIT ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -51,7 +52,9 @@ public class HistoryDAO {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Integer foodID = rs.getInt("food_id");
-                history.add(foodID);
+                Timestamp date = rs.getTimestamp("log_date");
+                LogEntry entry = new LogEntry(date, foodID);
+                history.add(entry);
             }
         } catch (SQLException e) {
             e.printStackTrace();
