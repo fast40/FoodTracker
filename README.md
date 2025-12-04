@@ -1,8 +1,6 @@
-# Getting Started
-
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
-
 # Development
+
+A brief guide to setting up the project and running it on your machine.
 
 ## Backend
 
@@ -33,7 +31,7 @@ mvn test
 - [ ] Integrate the front end. Build the front end and copy the output during maven build.
 
 
-### COMMANDS
+## Commands
 
 To start the frontend:
 ```sh
@@ -57,7 +55,7 @@ USE food_tracker
 ```
 
 
-### Using Eclipse
+## Using Eclipse
 
 > [!WARNING]
 > The following section is outdated after the migration to maven, and needs to be updated.
