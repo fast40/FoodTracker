@@ -7,17 +7,19 @@ import History from "@/pages/History"
 import Login from "@/pages/Login"
 import Register from "@/pages/Register"
 import Settings from "@/pages/Settings";
+import Scan from "@/pages/Scan";
 
 function App() {
   return (
     <Routes>
-      <Route element={<Home />} path="/" />
-      <Route element={<Dashboard />} path="/dashboard" />
-      <Route element={<AddFood />} path="/add" />
-      <Route element={<History />} path="/history" />
-      <Route element={<Login />} path="/login" />
-      <Route element={<Register />} path="/register" />
-      <Route element={<Settings />} path="/settings" />
+        <Route element={<Home />} path="/" />
+        <Route element={<Dashboard />} path="/dashboard" />
+        <Route element={<AddFood />} path="/add" />
+        <Route element={<History />} path="/history" />
+        <Route element={<Login />} path="/login" />
+        <Route element={<Register />} path="/register" />
+        <Route element={<Settings />} path="/settings" />
+        <Route element={<Scan />} path="/scan" />
     </Routes>
   );
 }
