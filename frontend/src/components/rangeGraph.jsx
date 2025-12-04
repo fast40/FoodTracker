@@ -86,7 +86,7 @@ export const RangeGraph = () => {
             const dvPercents = {};
 
             for (const n of nutrients) {
-                const dv = DEFAULT_DV[n.key] ?? 1;  // avoid divide-by-zero
+                const dv = DEFAULT_DV[n.key] ?? 1;
                 dvPercents[n.key] = (totals[n.key] / dv) * 100;
             }
 
@@ -97,6 +97,26 @@ export const RangeGraph = () => {
         });
     }, [days, nutrients]);
 
+    function ValueTooltip({ active, payload, label }) {
+        if (!active || !payload?.length) return null;
+        const sorted = [...payload].sort((a, b) => b.value - a.value);
+        return (
+            <div className="rounded-medium border bg-background p-2 text-sm">
+                <div className="font-medium mb-1">{label}</div>
+                {sorted.map((p) => (
+                    <div key={p.dataKey} className="flex items-center gap-2">
+                    <span
+                    className="inline-block h-3 w-3 rounded-sm"
+                    style={{ backgroundColor: p.color }}
+                    />
+                    <span>{p.name}:</span>
+                    <span>{Math.round(p.value)}%</span>
+                    </div>
+                ))}
+            </div>
+        );
+    }
+    //Bool to determine whether reference line is drawn at 100%
     const anyOver100 = data.some(entry => Object.values(entry).some(v => v > 100));
 
 
@@ -140,7 +160,7 @@ export const RangeGraph = () => {
                         }}
                     />
 
-                    {/*<Tooltip />*/}
+                    <Tooltip content={<ValueTooltip />} />
                     <Legend />
 
                     {anyOver100 && (

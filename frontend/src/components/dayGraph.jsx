@@ -101,25 +101,25 @@ export const DayGraph = () => {
         const unit = nutrientKey ? UNITS[nutrientKey] || "" : "";
         return (
             <div className="rounded-medium border bg-background p-2 text-sm">
-            <div className="font-medium mb-1">{label}</div>
-            {payload.map((p) => {
-                const foodId = p.dataKey;
-                const abs = p?.payload?.[`${foodId}__abs`] ?? 0;
-                const food = foods.find((f) => f.id === foodId);
-                return (
-                <div key={foodId} className="flex items-center gap-2">
-                    <span
-                    className="inline-block h-3 w-3 rounded-sm"
-                    style={{ backgroundColor: p.color }}
-                    />
-                    <span>{food?.name || foodId}:</span>
-                    <span className="tabular-nums">
-                    {abs}
-                    {unit ? ` ${unit}` : ""}
-                    </span>
-                </div>
-                );
-            })}
+                <div className="font-medium mb-1">{label}</div>
+                {payload.map((p) => {
+                    const foodId = p.dataKey;
+                    const abs = p?.payload?.[`${foodId}__abs`] ?? 0;
+                    const food = foods.find((f) => f.id === foodId);
+                    return (
+                    <div key={foodId} className="flex items-center gap-2">
+                        <span
+                        className="inline-block h-3 w-3 rounded-sm"
+                        style={{ backgroundColor: p.color }}
+                        />
+                        <span>{food?.name || foodId}:</span>
+                        <span className="tabular-nums">
+                        {abs}
+                        {unit ? ` ${unit}` : ""}
+                        </span>
+                    </div>
+                    );
+                })}
             </div>
         );
     }
