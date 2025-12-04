@@ -17,9 +17,11 @@ import { siteConfig } from "@/site-config";
 //import { ThemeSwitch } from "@/components/theme-switch";
 //import { Logo } from "@/components/icons";
 import { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   return (
     <HeroUINavbar
@@ -59,6 +61,36 @@ export const Navbar = () => {
               </Link>
             </NavbarItem>
           ))}
+          { user ? (
+            <NavbarItem onClick={logout} style={{ cursor: 'pointer' }}>Logout</NavbarItem>
+          ) : (
+            <>
+              <NavbarItem>
+                <Link
+                  className={clsx(
+                    linkStyles({ color: "white" }),
+                    "data-[active=true]:text-primary data-[active=true]:font-medium"
+                  )}
+                  color="white"
+                  href={'/login'}
+                >
+                  Login
+                </Link>
+              </NavbarItem>
+              <NavbarItem>
+                <Link
+                  className={clsx(
+                    linkStyles({ color: "white" }),
+                    "data-[active=true]:text-primary data-[active=true]:font-medium"
+                  )}
+                  color="white"
+                  href={'/register'}
+                >
+                  Register
+                </Link>
+              </NavbarItem>
+            </>
+          )}
         </div>
         <div className="hidden lg:flex gap-4 justify-end ml-auto">
           {siteConfig.navRight.map((item) => (
