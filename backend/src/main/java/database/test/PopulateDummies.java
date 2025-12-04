@@ -27,13 +27,6 @@ public class PopulateDummies {
         historyDAO = new HistoryDAO();
     }
 
-    public void run() {
-        clearDummyData();
-        addDummyFoods();
-        logFoodToDummy();
-        System.out.println("Dummy data populated successfully!");
-    }
-
     private void addDummyFoods() {
         FoodItem foodItem = new FoodItem();
         List<Nutrient> nutrients = new ArrayList<>();
@@ -52,6 +45,10 @@ public class PopulateDummies {
         nutrients.add(new Nutrient(NutrientType.SUGARS_TOTAL, 19));
         nutrients.add(new Nutrient(NutrientType.VITAMIN_C, 8));
         foodItem.setNutrients(nutrients);
+        System.out.println("Description: " + foodItem.getDescription());
+        System.out.println("Serving Size: " + foodItem.getServingSize());
+        System.out.println("Creator ID: " + foodItem.getCreatorID());
+        System.out.println("Nutrients: " + foodItem.getNutrients().size());
         foodIds.add(foodDAO.insertFoodItem(foodItem));
 
         // 1: Chicken Breast
@@ -66,6 +63,10 @@ public class PopulateDummies {
         nutrients.add(new Nutrient(NutrientType.CHOLESTEROL, 85));
         nutrients.add(new Nutrient(NutrientType.SODIUM, 74));
         foodItem.setNutrients(nutrients);
+        System.out.println("Description: " + foodItem.getDescription());
+        System.out.println("Serving Size: " + foodItem.getServingSize());
+        System.out.println("Creator ID: " + foodItem.getCreatorID());
+        System.out.println("Nutrients: " + foodItem.getNutrients().size());
         foodIds.add(foodDAO.insertFoodItem(foodItem));
 
         // 2: Brown Rice
@@ -80,6 +81,10 @@ public class PopulateDummies {
         nutrients.add(new Nutrient(NutrientType.FIBER, 3.5f));
         nutrients.add(new Nutrient(NutrientType.MAGNESIUM, 84));
         foodItem.setNutrients(nutrients);
+        System.out.println("Description: " + foodItem.getDescription());
+        System.out.println("Serving Size: " + foodItem.getServingSize());
+        System.out.println("Creator ID: " + foodItem.getCreatorID());
+        System.out.println("Nutrients: " + foodItem.getNutrients().size());
         foodIds.add(foodDAO.insertFoodItem(foodItem));
 
         // 3: Broccoli
@@ -95,6 +100,10 @@ public class PopulateDummies {
         nutrients.add(new Nutrient(NutrientType.VITAMIN_C, 135));
         nutrients.add(new Nutrient(NutrientType.VITAMIN_K, 116));
         foodItem.setNutrients(nutrients);
+        System.out.println("Description: " + foodItem.getDescription());
+        System.out.println("Serving Size: " + foodItem.getServingSize());
+        System.out.println("Creator ID: " + foodItem.getCreatorID());
+        System.out.println("Nutrients: " + foodItem.getNutrients().size());
         foodIds.add(foodDAO.insertFoodItem(foodItem));
 
         // 4: Salmon
@@ -110,6 +119,10 @@ public class PopulateDummies {
         nutrients.add(new Nutrient(NutrientType.FATTY_ACID_20_5_EPA, 0.8f));
         nutrients.add(new Nutrient(NutrientType.VITAMIN_D, 11));
         foodItem.setNutrients(nutrients);
+        System.out.println("Description: " + foodItem.getDescription());
+        System.out.println("Serving Size: " + foodItem.getServingSize());
+        System.out.println("Creator ID: " + foodItem.getCreatorID());
+        System.out.println("Nutrients: " + foodItem.getNutrients().size());
         foodIds.add(foodDAO.insertFoodItem(foodItem));
 
         // 5: Banana
@@ -125,6 +138,10 @@ public class PopulateDummies {
         nutrients.add(new Nutrient(NutrientType.POTASSIUM, 422));
         nutrients.add(new Nutrient(NutrientType.VITAMIN_B6, 0.4f));
         foodItem.setNutrients(nutrients);
+        System.out.println("Description: " + foodItem.getDescription());
+        System.out.println("Serving Size: " + foodItem.getServingSize());
+        System.out.println("Creator ID: " + foodItem.getCreatorID());
+        System.out.println("Nutrients: " + foodItem.getNutrients().size());
         foodIds.add(foodDAO.insertFoodItem(foodItem));
 
         // 6: Eggs
@@ -140,6 +157,10 @@ public class PopulateDummies {
         nutrients.add(new Nutrient(NutrientType.VITAMIN_D, 1));
         nutrients.add(new Nutrient(NutrientType.VITAMIN_B12, 0.6f));
         foodItem.setNutrients(nutrients);
+        System.out.println("Description: " + foodItem.getDescription());
+        System.out.println("Serving Size: " + foodItem.getServingSize());
+        System.out.println("Creator ID: " + foodItem.getCreatorID());
+        System.out.println("Nutrients: " + foodItem.getNutrients().size());
         foodIds.add(foodDAO.insertFoodItem(foodItem));
 
         // 7: Oatmeal
@@ -155,7 +176,38 @@ public class PopulateDummies {
         nutrients.add(new Nutrient(NutrientType.IRON, 2));
         nutrients.add(new Nutrient(NutrientType.MAGNESIUM, 56));
         foodItem.setNutrients(nutrients);
+        System.out.println("Description: " + foodItem.getDescription());
+        System.out.println("Serving Size: " + foodItem.getServingSize());
+        System.out.println("Creator ID: " + foodItem.getCreatorID());
+        System.out.println("Nutrients: " + foodItem.getNutrients().size());
         foodIds.add(foodDAO.insertFoodItem(foodItem));
+    }
+
+    public void run() {
+        clearDummyData();
+        createDummyUser();  // Add this
+        addDummyFoods();
+        logFoodToDummy();
+        System.out.println("Dummy data populated successfully!");
+    }
+
+    private void createDummyUser() {
+        String sql = "INSERT INTO users (user_id, username, email, password) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, dummyUserID);
+            stmt.setString(2, "dummy_user");
+            stmt.setString(3, "dummy@test.com");
+            stmt.setString(4, "password123");
+
+            stmt.executeUpdate();
+            System.out.println("Created dummy user with ID: " + dummyUserID);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void clearDummyData() {
@@ -170,7 +222,7 @@ public class PopulateDummies {
             }
 
             // 2. Delete nutrients for foods created by dummy user
-            String deleteNutrients = "DELETE FROM food_nutrients WHERE food_id IN (SELECT food_id FROM food_items WHERE created_by = ?)";
+            String deleteNutrients = "DELETE FROM food_nutrient_values WHERE food_id IN (SELECT food_id FROM food_items WHERE created_by = ?)";
             try (PreparedStatement stmt = conn.prepareStatement(deleteNutrients)) {
                 stmt.setInt(1, dummyUserID);
                 int deleted = stmt.executeUpdate();
@@ -183,6 +235,14 @@ public class PopulateDummies {
                 stmt.setInt(1, dummyUserID);
                 int deleted = stmt.executeUpdate();
                 System.out.println("Deleted " + deleted + " food entries");
+            }
+
+            // 4. Delete the dummy user
+            String deleteUser = "DELETE FROM users WHERE user_id = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(deleteUser)) {
+                stmt.setInt(1, dummyUserID);
+                int deleted = stmt.executeUpdate();
+                System.out.println("Deleted " + deleted + " user entries");
             }
 
             System.out.println("Cleared existing dummy data");
