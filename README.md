@@ -32,6 +32,13 @@ mvn test
 
 - [ ] Integrate the front end. Build the front end and copy the output during maven build.
 
+
+### COMMANDS
+
+> To run mysql queries:
+```docker exec -it mysql /bin/mysql -u root -p```
+
+
 ### Using Eclipse
 
 > [!WARNING]

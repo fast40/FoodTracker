@@ -79,7 +79,7 @@ export const RangeGraph = () => {
             for (const entry of day.entries) {
                 for (const n of nutrients) {
                     const factor = entry?.consumed?.servings ?? 1;
-                    totals[n.key] += entry.nutrients[n.key] * factor ?? 0;
+                    totals[n.key] += (entry.nutrients[n.key] ?? 0) * factor;
                 }
             }
 
