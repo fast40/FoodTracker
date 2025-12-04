@@ -16,10 +16,12 @@ import clsx from "clsx";
 import { siteConfig } from "@/site-config";
 //import { ThemeSwitch } from "@/components/theme-switch";
 //import { Logo } from "@/components/icons";
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   return (
     <HeroUINavbar
@@ -79,12 +81,12 @@ export const Navbar = () => {
                     "data-[active=true]:text-primary data-[active=true]:font-medium"
                   )}
                   color="white"
-                  href={item.href}
+                  href={'/register'}
                 >
-                  {item.label}
+                  Register
                 </Link>
               </NavbarItem>
-            )
+            </>
           )}
         </div>
         <div className="hidden lg:flex gap-4 justify-end ml-auto">

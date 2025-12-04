@@ -42,13 +42,5 @@ export const siteConfig = {
       label: "History",
       href: "/history",
     },
-    {
-      label: "Login",
-      href: "/login",
-    },
-    {
-      label: "Register",
-      href: "/register",
-    },
   ],
 };
