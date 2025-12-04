@@ -4,10 +4,7 @@ import database.helpers.Enumerations;
 import database.wrappers.FoodItem;
 import database.wrappers.Nutrient;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,9 +107,11 @@ public class FoodDAO {
     }
 
     public int insertFoodItem(FoodItem food) {
-        String sql_injection = "INSERT INTO * food_items (fdc_id, description, data_type, brand_owner, serving_size, serving_size_unit, household_serving_full_text, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO food_items (fdc_id, description, data_type, brand_owner, serving_size, serving_size_unit, household_serving_full_text, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql_injection)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             stmt.setObject(1, food.getFdcId());
             stmt.setString(2, food.getDescription());
             stmt.setString(3, food.getDataType());
@@ -125,9 +124,15 @@ public class FoodDAO {
             int rowsAffected = stmt.executeUpdate();
 
             if (rowsAffected > 0) {
-                ResultSet generated_keys = stmt.getGeneratedKeys();
-                if (generated_keys.next()) {
-                    return generated_keys.getInt(1);
+                ResultSet generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int foodId = generatedKeys.getInt(1);
+
+                    if (food.getNutrients() != null && !food.getNutrients().isEmpty()) {
+                        insertNutrientsByFood(foodId, food.getNutrients());
+                    }
+
+                    return foodId;
                 }
             }
 
@@ -137,6 +142,27 @@ public class FoodDAO {
         return -1;
     }
 
+    public boolean insertNutrientsByFood(int foodId, List<Nutrient> nutrients) {
+        String sql = "INSERT INTO food_nutrients (food_id, nutrient_id, amount) VALUES (?, ?, ?)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            for (Nutrient nutrient : nutrients) {
+                stmt.setInt(1, foodId);
+                stmt.setInt(2, nutrient.getNutrientId());
+                stmt.setFloat(3, nutrient.getAmount());
+                stmt.addBatch();
+            }
+
+            stmt.executeBatch();
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     public Integer getFoodIdByFdcId(int fdcId) {
         String query = "SELECT food_id FROM food_items WHERE fdc_id = ?";
 

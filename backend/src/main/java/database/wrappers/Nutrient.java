@@ -1,5 +1,7 @@
 package database.wrappers;
 
+import database.helpers.Enumerations;
+
 public class Nutrient {
     private int nutrientId;
     private String name;
@@ -7,6 +9,13 @@ public class Nutrient {
     private float amount;
     private String unitName;
 
+    public Nutrient(Enumerations.NutrientType nutrientType, float amount) {
+        this.nutrientId = nutrientType.getId();
+        // this.number = nutrientType.getNumber(); not implemented
+        this.name = nutrientType.getName();
+        this.unitName = nutrientType.getUnit();
+        this.amount =  amount;
+    }
     public Nutrient(int nutrientId, String name, String number, float amount, String unitName) {
         this.nutrientId = nutrientId;
         this.name = name;
