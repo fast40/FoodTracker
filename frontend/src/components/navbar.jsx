@@ -16,7 +16,7 @@ import clsx from "clsx";
 import { siteConfig } from "@/site-config";
 //import { ThemeSwitch } from "@/components/theme-switch";
 //import { Logo } from "@/components/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
 import { useAuth } from "../context/AuthContext";
 
 export const Navbar = () => {
@@ -81,12 +81,12 @@ export const Navbar = () => {
                     "data-[active=true]:text-primary data-[active=true]:font-medium"
                   )}
                   color="white"
-                  href={'/register'}
+                  href={item.href}
                 >
-                  Register
+                  {item.label}
                 </Link>
               </NavbarItem>
-            </>
+            )
           )}
         </div>
         <div className="hidden lg:flex gap-4 justify-end ml-auto">
