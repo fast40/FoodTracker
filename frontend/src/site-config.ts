@@ -1,13 +1,9 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Clolo",
+  name: "FoodTracker",
   description: "Track daily nutrients with barcode scans and charts.",
-  navItems: [
-    {
-      label: "Home",
-      href: "/",
-    },
+  navLeft: [
     {
       label: "Dashboard",
       href: "/dashboard",
@@ -19,13 +15,21 @@ export const siteConfig = {
     {
       label: "History",
       href: "/history",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
     },
   ],
-  navMenuItems: [
+  navRight: [
+    //TODO: show settings/logout when user logged in, login/register otherwise
+    {
+      label: "Login",
+      href: "/login",
+    },
+    {
+      label: "Register",
+      href: "/register",
+    },
+  ],
+  navMenu: [
+    //TODO: show settings/logout when user logged in, login/register otherwise
     {
       label: "Dashboard",
       href: "/dashboard",
@@ -37,14 +41,6 @@ export const siteConfig = {
     {
       label: "History",
       href: "/history",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Logout",
-      href: "/logout",
     },
   ],
 };

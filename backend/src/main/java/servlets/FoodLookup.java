@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 
 import com.google.gson.Gson;
 
+import database.data_access.FoodDAO;
 import database.helpers.USDAFoodAPI;
 import database.wrappers.FoodItem;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,13 +17,15 @@ import jakarta.servlet.http.HttpServletResponse;
 public class FoodLookup extends HttpServlet {
 
     private final Gson gson = new Gson();
+    FoodDAO foodDAO = new FoodDAO();
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Enable CORS for frontend development
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "GET");
-        
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
@@ -37,26 +40,19 @@ public class FoodLookup extends HttpServlet {
         try {
             FoodItem foodItem = null;
 
-            // TODO: Database Lookup (Commented out as DB is not set up)
-            /*
             // Check if food exists in our DB first to avoid API call
-            foodItem = FoodDatabaseHelper.getFoodByGTIN(gtin);
+            foodItem = foodDAO.getFoodByGTIN(gtin);
             if (foodItem != null) {
                 out.print(gson.toJson(foodItem));
                 return;
             }
-            */
 
             // API Lookup
             foodItem = USDAFoodAPI.fetchFoodByGTIN(gtin);
 
             if (foodItem != null) {
-                // TODO: Save to Database (Commented out as DB is not set up)
-                /*
-                // Cache the result in our DB for future lookups
-                FoodDatabaseHelper.saveFoodItem(foodItem);
-                */
-                
+                foodDAO.insertFoodItem(foodItem);
+
                 out.print(gson.toJson(foodItem));
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -73,6 +69,9 @@ public class FoodLookup extends HttpServlet {
     private static class ErrorResponse {
         @SuppressWarnings("unused")
         String error;
-        ErrorResponse(String error) { this.error = error; }
+
+        ErrorResponse(String error) {
+            this.error = error;
+        }
     }
 }

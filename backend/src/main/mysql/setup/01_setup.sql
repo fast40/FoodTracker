@@ -1,3 +1,6 @@
+CREATE DATABASE IF NOT EXISTS food_tracker;
+USE food_tracker;
+
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(64) NOT NULL UNIQUE,
