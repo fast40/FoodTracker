@@ -6,6 +6,7 @@ import AddFood from "@/pages/AddFood";
 import History from "@/pages/History"
 import Login from "@/pages/Login"
 import Register from "@/pages/Register"
+import Settings from "@/pages/Settings";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route element={<History />} path="/history" />
         <Route element={<Login />} path="/login" />
         <Route element={<Register />} path="/register" />
+        <Route element={<Settings />} path="/settings" />
     </Routes>
   );
 }

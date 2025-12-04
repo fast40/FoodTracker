@@ -75,6 +75,18 @@ export const Navbar = () => {
               </Link>
             </NavbarItem>
           ))}
+          <NavbarItem>
+            <Link
+              className={clsx(
+                linkStyles({ color: "white" }),
+                "data-[active=true]:text-primary data-[active=true]:font-medium"
+              )}
+              color="white"
+              href="/settings"
+            >
+              Settings
+            </Link>
+          </NavbarItem>
         </div>
       </NavbarContent>
       <NavbarMenu className="bg-[#131313]">
@@ -85,6 +97,11 @@ export const Navbar = () => {
             </Link>
           </NavbarMenuItem>
         ))}
+        <NavbarMenuItem onClick={() => setMenuOpen(false)}>
+          <Link href="/settings" color="white">
+            Settings
+          </Link>
+        </NavbarMenuItem>
       </NavbarMenu>
     </HeroUINavbar>
   );
