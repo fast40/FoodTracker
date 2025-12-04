@@ -1,8 +1,7 @@
 import DefaultLayout from "@/layouts/default";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
 import { Form, Input, Button } from "@heroui/react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login()
 {
@@ -11,14 +10,11 @@ export default function Login()
     password: ""
   });
 
+  const { user, login } = useAuth();
+
   async function handleSubmit(e) {
     e.preventDefault();
-
-    const response = await fetch("http://localhost:8080/food-tracker/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData)
-    });
+    login(formData);
   }
 
   return (

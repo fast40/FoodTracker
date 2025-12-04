@@ -8,10 +8,10 @@ import Register from "@/pages/Register"
 function App() {
   return (
     <Routes>
-        <Route element={<Dashboard />} path="/" />
-        <Route element={<AddFood />} path="/add" />
-        <Route element={<Login />} path="/login" />
-        <Route element={<Register />} path="/register" />
+      <Route element={<Dashboard />} path="/" />
+      <Route element={<AddFood />} path="/add" />
+      <Route element={<Login />} path="/login" />
+      <Route element={<Register />} path="/register" />
     </Routes>
   );
 }

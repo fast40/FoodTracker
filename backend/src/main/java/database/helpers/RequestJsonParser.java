@@ -21,6 +21,7 @@ public class RequestJsonParser {
                         }
                 } catch (IOException e) {
                         e.printStackTrace();
+                        return null;
                 }
 
                 String json = jsonBuilder.toString();
