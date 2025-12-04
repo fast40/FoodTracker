@@ -17,6 +17,28 @@ import {
 } from "recharts";
 import { DEFAULT_DV, UNITS, PALETTE } from "@/data";
 
+const STORAGE_KEY = "nutrientVisibility";
+
+const BASE_NUTRIENTS = [
+  { key: "energy_kcal", label: "Calories", settingsKey: "calories" },
+  { key: "protein_g", label: "Protein", settingsKey: "protein" },
+  { key: "carbs_g", label: "Carbs", settingsKey: "carbs" },
+  { key: "fat_g", label: "Fat", settingsKey: "fat" },
+  { key: "fiber_g", label: "Fiber", settingsKey: "fiber" },
+  { key: "sodium_mg", label: "Sodium", settingsKey: "sodium" },
+  { key: "sugars_g", label: "Sugars", settingsKey: "sugars" },
+];
+
+function loadVisibility() {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
 
 export const DayGraph = () => {
 
@@ -34,15 +56,14 @@ export const DayGraph = () => {
 
     // Nutrient categories (bars on X-axis)
     const nutrients = useMemo(
-    () => [
-        { key: "energy_kcal", label: "Calories" },
-        { key: "protein_g", label: "Protein" },
-        { key: "carbs_g", label: "Carbs" },
-        { key: "fat_g", label: "Fat" },
-        { key: "fiber_g", label: "Fiber" },
-        { key: "sodium_mg", label: "Sodium" },
-        { key: "sugars_g", label: "Sugars" },
-    ]);
+    () => {
+        const visibility = loadVisibility();
+        const filtered = BASE_NUTRIENTS.filter((n) => {
+            const flag = visibility[n.settingsKey];
+            return flag === undefined ? true : !!flag;
+        });
+        return filtered.map((n) => ({ key: n.key, label: n.label }));
+    }, []);
 
     const foods = (entries || []).map((e, i) => ({
         id: e.id || String(i),
@@ -70,7 +91,7 @@ export const DayGraph = () => {
         });
     });
     return rows;
-    }, [entries, nutrients]);
+    }, [entries, nutrients, foods]);
 
     // Tooltip: show absolute values with units for the hovered nutrient
     function ValueTooltip({ active, payload, label }) {

@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/api/logout")
+@WebServlet("/api/me")
 public class Me extends HttpServlet {
 
 	@Override
