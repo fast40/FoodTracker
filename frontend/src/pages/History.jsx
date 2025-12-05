@@ -290,12 +290,14 @@ export default function History() {
   const testDays = testData ? testData.days || [] : [];
 
   //Prefer backend if available; otherwise show placeholder data
-  const allDays =
-    backendDays.length > 0
-      ? backendDays
-      : Array.isArray(testDays)
-      ? testDays
-      : [];
+  // const allDays =
+  //   backendDays.length > 0
+  //     ? backendDays
+  //     : Array.isArray(testDays)
+  //     ? testDays
+  //     : [];
+  // If backend returned empty → show empty. DO NOT use test data on History page.
+  const allDays = backendDays;
 
   //nutrient visibility (calories, protein, etc)
   const [visibility, setVisibility] = useState(DEFAULT_VISIBILITY);
