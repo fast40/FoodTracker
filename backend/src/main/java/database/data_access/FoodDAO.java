@@ -199,6 +199,6 @@ public class FoodDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return nutrients;
     }
 }
