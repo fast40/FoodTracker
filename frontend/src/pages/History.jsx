@@ -1,6 +1,6 @@
 import DefaultLayout from "@/layouts/default";
 import { useEffect, useMemo, useState } from "react";
-import { useTestData, useRangeData } from "@/hooks/dashboardData";
+import { useRangeData } from "@/hooks/dashboardData";
 import { Button } from "@heroui/react";
 import { BASE_NUTRIENTS } from "@/data";
 
@@ -284,10 +284,6 @@ export default function History() {
   //debug
   console.log("backendRange raw:", backendRange);
   console.log("backendDays transformed:", backendDays); 
-
-  //Test data fallback 
-  const testData = useTestData();
-  const testDays = testData ? testData.days || [] : [];
 
   //Prefer backend if available; otherwise show placeholder data
   // const allDays =
