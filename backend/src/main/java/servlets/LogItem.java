@@ -57,7 +57,7 @@ public class LogItem extends HttpServlet {
                 try (
                         Connection connection = DatabaseConnection.getConnection();
                         PreparedStatement addItem = connection.prepareStatement("INSERT INTO food_items (name, energy_kcal, protein_g, carbs_g, fat_g, fiber_g, sodium_mg, sugars_g, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-                        PreparedStatement addLog = connection.prepareStatement("INSERT INTO food_logs (user_id, item_id) VALUES (?, ?)");
+                        PreparedStatement addLog = connection.prepareStatement("INSERT INTO food_logs (user_id, item_id, quantity) VALUES (?, ?, ?)");
                 ) {
 
                         addItem.setString(1, foodEntry.name);
@@ -78,6 +78,7 @@ public class LogItem extends HttpServlet {
 
                         addLog.setInt(1, user.id());
                         addLog.setLong(2, itemId);
+                        addLog.setFloat(3, foodEntry.servings());
 
                         addLog.executeUpdate();
 
