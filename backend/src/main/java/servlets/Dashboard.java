@@ -70,8 +70,9 @@ public class Dashboard extends HttpServlet {
         Integer userID = Integer.parseInt(request.getParameter(userIDRequest));
 
         String limitParam = request.getParameter(entryLimitRequest);
-        String tzParam = request.getParameter(timezoneRequest);
-        ZoneId userZone = (tzParam != null) ? ZoneId.of(tzParam) : ZoneId.of("UTC");
+        // String tzParam = request.getParameter(timezoneRequest);
+        // ZoneId userZone = (tzParam != null) ? ZoneId.of(tzParam) : ZoneId.of("UTC");
+        ZoneId userZone = ZoneId.of("UTC");
 
         System.out.println("Request with: " + mysql_start + " to " + mysql_end + " for user " + userID + " in timezone " + userZone);
 
