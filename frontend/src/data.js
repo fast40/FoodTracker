@@ -30,9 +30,10 @@ export const UNITS = {
 
 export const PALETTE = [
     "#7471b3ff",
-    "#2c3772ff",
+    "#313d85ff",
     "#4e9cb1ff",
     "#6bd1a5ff",
     "#60a344ff",
+    "#be916eff",
     "#7a4628ff",
 ];

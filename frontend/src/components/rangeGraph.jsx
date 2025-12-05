@@ -36,15 +36,7 @@ function addDays(start, n) {
   return d.toISOString();
 }
 
-export const RangeGraph = () => {
-
-    const today = new Date();
-    const offset = new Date().getTimezoneOffset(); // in minutes
-    const localDate = new Date(today).getTime() - offset * 60000;
-
-    const [date, setDate] = useState(new Date(localDate).toISOString().slice(0, 10));
-    //const startDate = useMemo(() => new Date(date).toISOString(), [date]);
-    //const endDate = useMemo(() => addDays(new Date(date), 7), [date]);
+export function RangeGraph({ date, setDate }) {
 
     const { startDate, endDate, weekLocalDates } = useMemo(() => {
         const d = new Date(date);
@@ -126,7 +118,7 @@ export const RangeGraph = () => {
         const sorted = [...payload].sort((a, b) => b.value - a.value);
         return (
             <div className="rounded-medium border bg-background p-2 text-sm">
-                <div className="font-medium mb-1">{formatWeekday(label)}</div>
+                <div className="font-medium mb-1">{formatWeekday(label)} ({label.slice(5, 10)})</div>
                 {sorted.map((p) => (
                     <div key={p.dataKey} className="flex items-center gap-2">
                     <span
@@ -212,7 +204,7 @@ export const RangeGraph = () => {
             {/* Chart */}
             <div className="w-full">
                 <ResponsiveContainer width="100%" height={580} className="mt-1">
-                <LineChart data={data} margin={{ top: 10, right: 0, left: -50, bottom: 8 }}>
+                <LineChart key={startDate} data={data} margin={{ top: 10, right: 0, left: -50, bottom: 8 }}>
                     <CartesianGrid strokeDasharray="3 3" />
 
                     <XAxis
@@ -222,7 +214,7 @@ export const RangeGraph = () => {
                     />
                     <YAxis 
                         domain={[0, 100]}
-                        tickFormatter={(v) => `${v}%`}
+                        tickFormatter={(v) => `${Math.round(v)}%`}
                         width={130}
                         label={{
                             value: "Daily Value (%)",

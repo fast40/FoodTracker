@@ -36,13 +36,8 @@ function addDays(start, n) {
   return d.toISOString();
 }
 
-export const DayGraph = () => {
+export function DayGraph({ date, setDate }) {
 
-    const today = new Date();
-    const offset = new Date().getTimezoneOffset(); // in minutes
-    const localDate = new Date(today).getTime() - offset * 60000;
-
-    const [date, setDate] = useState(new Date(localDate).toISOString().slice(0, 10));
     const startDate = useMemo(() => new Date(date).toISOString(), [date]);
     const endDate = useMemo(() => addDays(new Date(date), 1), [date]);
 
@@ -123,7 +118,7 @@ export const DayGraph = () => {
                         <span>{food?.name || foodId}:</span>
                         <span className="tabular-nums">
                         {abs}
-                        {unit ? ` ${unit}` : ""}
+                        {unit ? `${unit}` : ""}
                         </span>
                     </div>
                     );
@@ -161,6 +156,18 @@ export const DayGraph = () => {
         );
     }
 
+    const formatWeekday = (yyyyMmDd) => {
+        if (!yyyyMmDd) return "";
+        const [y, m, d] = yyyyMmDd.split("-").map(Number);
+        const dt = new Date(y, m - 1, d);                         // local date (avoids UTC offset issues)
+        return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(dt);
+    };
+
+    function formatDay(iso) {
+        const d = new Date(iso);
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    }
+
     //Bool to determine whether reference line is drawn at 100%
     const anyOver100 = data.some(r => (r.totalPctUncapped || 0) > 100);
 
@@ -173,6 +180,7 @@ export const DayGraph = () => {
                 <div className="flex items-center">
                     <Button onPress={() => setDate(addDays(date, -1).slice(0, 10))} className="rounded-l-lg rounded-r-none text-xl font-semibold min-w-5" style={{ background: "rgb(40, 40, 40)" }}>&lt;</Button>
                     <Button onPress={() => setDate(addDays(date, 1).slice(0, 10))} className="rounded-l-none rounded-r-lg text-xl font-semibold min-w-5" style={{ background: "rgb(40, 40, 40)" }}>&gt;</Button>
+                    <b className="ml-5">{formatWeekday(startDate.slice(0, 10))}, {formatDay(addDays(startDate, 1).slice(0, 10))}</b>
                 </div>
                 <div className="flex items-center gap-3">
                     <DatePicker
@@ -189,12 +197,12 @@ export const DayGraph = () => {
 
             {/* Chart */}
             <ResponsiveContainer width="100%" height={600}>
-            <BarChart data={data} margin={{ top: 10, right: 0, left: -50, bottom: 8 }}>
+            <BarChart key={foodsSorted.map(f => f.id).join("_")} data={data} margin={{ top: 10, right: 0, left: -50, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" />
                 <YAxis
                     domain={[0, 100]}
-                    tickFormatter={(v) => `${v}%`}
+                    tickFormatter={(v) => `${Math.round(v)}%`}
                     width={130}
                     label={{
                         value: "Daily Value (%)",
