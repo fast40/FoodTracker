@@ -33,7 +33,7 @@ const NUTRIENT_FIELDS =
 ];
 
 //base URL for your Tomcat backend
-const API_BASE = "http://localhost:8080/FoodTracker";
+const API_BASE = "http://localhost:8080/food-tracker";
 
 
 export default function AddFood() 
@@ -93,6 +93,7 @@ export default function AddFood()
       const res = await fetch(`${API_BASE}/api/log-item`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
 
