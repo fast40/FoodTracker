@@ -7,6 +7,7 @@ export const siteConfig = {
     {
       label: "Add Food",
       href: "/add",
+      show: "always",
     },
     {
       label: "Dashboard",
@@ -15,24 +16,36 @@ export const siteConfig = {
     {
       label: "History",
       href: "/history",
+      show: "always",
     },
   ],
   navRight: [
-    //TODO: show settings/logout when user logged in, login/register otherwise
     {
       label: "Login",
       href: "/login",
+      show: "logged_out",
     },
     {
       label: "Register",
       href: "/register",
+      show: "logged_out",
+    },
+    {
+      label: "Logout",
+      href: "/logout",
+      show: "logged_in",
+    },
+    {
+      label: "Settings",
+      href: "/settings",
+      show: "logged_in",
     },
   ],
   navMenu: [
-    //TODO: show settings/logout when user logged in, login/register otherwise
     {
       label: "Add Food",
       href: "/add",
+      show: "always",
     },
     {
       label: "Dashboard",
@@ -41,6 +54,27 @@ export const siteConfig = {
     {
       label: "History",
       href: "/history",
+      show: "always",
+    },
+    {
+      label: "Login",
+      href: "/login",
+      show: "logged_out",
+    },
+    {
+      label: "Register",
+      href: "/register",
+      show: "logged_out",
+    },
+    {
+      label: "Logout",
+      href: "/logout",
+      show: "logged_in",
+    },
+    {
+      label: "Settings",
+      href: "/settings",
+      show: "logged_in",
     },
   ],
 };

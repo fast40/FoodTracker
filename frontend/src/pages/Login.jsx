@@ -1,7 +1,8 @@
 import DefaultLayout from "@/layouts/default";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, Input, Button } from "@heroui/react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Login()
 {
@@ -11,6 +12,13 @@ export default function Login()
   });
 
   const { user, login } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user]);
 
   async function handleSubmit(e) {
     e.preventDefault();

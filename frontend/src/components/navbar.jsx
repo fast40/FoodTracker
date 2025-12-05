@@ -13,12 +13,12 @@ import { link as linkStyles } from "@heroui/theme";
 import clsx from "clsx";
 
 import { siteConfig } from "@/site-config";
-import { useState, Fragment } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   return (
     <HeroUINavbar
@@ -44,33 +44,13 @@ export const Navbar = () => {
           </Link>
         </NavbarBrand>
         <div className="hidden lg:flex gap-4 justify-start ml-2">
-          {siteConfig.navLeft.map((item) =>
-            item.label === "Add Food" ? (
-              <NavbarItem key={item.href}>
-                <div className="flex gap-4">
-                  <Link
-                    className={clsx(
-                      linkStyles({ color: "white" }),
-                      "data-[active=true]:text-primary data-[active=true]:font-medium"
-                    )}
-                    color="white"
-                    href={item.href}
-                  >
-                    {item.label}
-                  </Link>
-                  <Link
-                    className={clsx(
-                      linkStyles({ color: "white" }),
-                      "data-[active=true]:text-primary data-[active=true]:font-medium"
-                    )}
-                    color="white"
-                    href="/scan"
-                  >
-                    Scan
-                  </Link>
-                </div>
-              </NavbarItem>
-            ) : (
+          {siteConfig.navLeft
+            .filter((item) => {
+              if (item.show == "logged_in") return user != null;
+              if (item.show == "logged_out") return user == null;
+              return true;
+            })
+            .map((item) => (
               <NavbarItem key={item.href}>
                 <Link
                   className={clsx(
@@ -83,11 +63,16 @@ export const Navbar = () => {
                   {item.label}
                 </Link>
               </NavbarItem>
-            )
-          )}
+            ))}
         </div>
         <div className="hidden lg:flex gap-4 justify-end ml-auto">
-          {siteConfig.navRight.map((item) => (
+          {siteConfig.navRight
+            .filter((item) => {
+              if (item.show == "logged_in") return user != null;
+              if (item.show == "logged_out") return user == null;
+              return true;
+            })
+            .map((item) => (
             <NavbarItem key={item.href}>
               <Link
                 className={clsx(
@@ -101,51 +86,22 @@ export const Navbar = () => {
               </Link>
             </NavbarItem>
           ))}
-          <NavbarItem>
-            <Link
-              className={clsx(
-                linkStyles({ color: "white" }),
-                "data-[active=true]:text-primary data-[active=true]:font-medium"
-              )}
-              color="white"
-              href="/settings"
-            >
-              Settings
-            </Link>
-          </NavbarItem>
         </div>
       </NavbarContent>
       <NavbarMenu className="bg-[#131313]">
-        {siteConfig.navMenu.map((item) =>
-          item.label === "Add Food" ? (
-            <Fragment key={item.href}>
-              <NavbarMenuItem onClick={() => setMenuOpen(false)}>
-                <Link href={item.href} color="white">
-                  {item.label}
-                </Link>
-              </NavbarMenuItem>
-              <NavbarMenuItem onClick={() => setMenuOpen(false)}>
-                <Link href="/scan" color="white">
-                  Scan
-                </Link>
-              </NavbarMenuItem>
-            </Fragment>
-          ) : (
-            <NavbarMenuItem
-              key={item.href}
-              onClick={() => setMenuOpen(false)}
-            >
-              <Link href={item.href} color="white">
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          )
-        )}
-        <NavbarMenuItem onClick={() => setMenuOpen(false)}>
-          <Link href="/settings" color="white">
-            Settings
-          </Link>
-        </NavbarMenuItem>
+        {siteConfig.navMenu
+          .filter((item) => {
+            if (item.show == "logged_in") return user != null;
+            if (item.show == "logged_out") return user == null;
+            return true;
+          })
+          .map((item) => (
+          <NavbarMenuItem key={item.href} onClick={() => setMenuOpen(false)}>
+            <Link href={item.href} color="white">
+              {item.label}
+            </Link>
+          </NavbarMenuItem>
+        ))}
       </NavbarMenu>
     </HeroUINavbar>
   );
