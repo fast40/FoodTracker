@@ -1,39 +1,89 @@
 import DefaultLayout from "@/layouts/default";
 import { useEffect, useMemo, useState } from "react";
-import { useTestData } from "@/hooks/dashboardData";
+import { useTestData, useRangeData } from "@/hooks/dashboardData";
 import { Button } from "@heroui/react";
-
+import { BASE_NUTRIENTS } from "@/data";
 
 const STORAGE_KEY = "nutrientVisibility";
 
-// Map between Settings keys and the keys used in the test data.
+//helper function --> add/bubtract days from a year-month-day string 
+//                --> use this to calculate the date range for backend queries 
+function addDays(start, n) 
+{
+  const d = new Date(start); 
+  d.setDate(d.getDate() + n); 
+  return d.toISOString();
+}
+
+//Nutrients: 
+//logicalKey --> used in UI and visibility settings
+//dataKey --> the key from backend data (energy_kcal, carbs_g, and more) 
+//label --> UI label
+//unit --> units for display
+//id --> numeric nutrient ID from backend, using BASE_NUTRIENTS lookup
+//
+//this allows us to unify: backend naming, local naming, display
+//need calories, protein, carbs, fat, fiber, sodium, sugars
 const NUTRIENTS = [
   {
-    logicalKey: "calories", // key used in Settings
-    dataKey: "energy_kcal", // key in entry.nutrients
+    logicalKey: "calories",
+    dataKey: "energy_kcal",
     label: "Calories",
     unit: "kcal",
+    id: BASE_NUTRIENTS.find((n) => n.settingsKey === "calories")?.id,
   },
-  { logicalKey: "protein", dataKey: "protein_g", label: "Protein", unit: "g" },
-  { logicalKey: "carbs", dataKey: "carbs_g", label: "Carbs", unit: "g" },
-  { logicalKey: "fat", dataKey: "fat_g", label: "Fat", unit: "g" },
-  { logicalKey: "fiber", dataKey: "fiber_g", label: "Fiber", unit: "g" },
+  {
+    logicalKey: "protein",
+    dataKey: "protein_g",
+    label: "Protein",
+    unit: "g",
+    id: BASE_NUTRIENTS.find((n) => n.settingsKey === "protein")?.id,
+  },
+  {
+    logicalKey: "carbs",
+    dataKey: "carbs_g",
+    label: "Carbs",
+    unit: "g",
+    id: BASE_NUTRIENTS.find((n) => n.settingsKey === "carbs")?.id,
+  },
+  {
+    logicalKey: "fat",
+    dataKey: "fat_g",
+    label: "Fat",
+    unit: "g",
+    id: BASE_NUTRIENTS.find((n) => n.settingsKey === "fat")?.id,
+  },
+  {
+    logicalKey: "fiber",
+    dataKey: "fiber_g",
+    label: "Fiber",
+    unit: "g",
+    id: BASE_NUTRIENTS.find((n) => n.settingsKey === "fiber")?.id,
+  },
   {
     logicalKey: "sodium",
     dataKey: "sodium_mg",
     label: "Sodium",
     unit: "mg",
+    id: BASE_NUTRIENTS.find((n) => n.settingsKey === "sodium")?.id,
   },
-  { logicalKey: "sugars", dataKey: "sugars_g", label: "Sugars", unit: "g" },
+  {
+    logicalKey: "sugars",
+    dataKey: "sugars_g",
+    label: "Sugars",
+    unit: "g",
+    id: BASE_NUTRIENTS.find((n) => n.settingsKey === "sugars")?.id,
+  },
 ];
 
-// Tabs for the top range selector (All / Last 7 days)
+
+//Top UI tabs for range selection (either all or the last 7 days)
 const RANGE_OPTIONS = [
   { id: "all", label: "All history" },
   { id: "last7", label: "Last 7 days" },
 ];
 
-// Default visibility if localStorage is empty or broken
+//default on/off visibility for nutrients
 const DEFAULT_VISIBILITY = {
   calories: true,
   protein: true,
@@ -44,29 +94,42 @@ const DEFAULT_VISIBILITY = {
   sugars: true,
 };
 
-/**
- * Utility: create an object with every nutrient total initialized to 0.
- * Example: { energy_kcal: 0, protein_g: 0, ... }
- */
+//daily values for computing %DV
+//FDA Daily Recommended Values
+const DAILY_VALUES = {
+  calories: 2000,
+  protein: 50,
+  carbs: 275,
+  fat: 78,
+  fiber: 28,
+  sodium: 2300,
+  sugars: 50,
+};
+
+
+//create an empty object 
 function createEmptyTotals() {
   const totals = {};
-  NUTRIENTS.forEach((n) => {
-    totals[n.dataKey] = 0;
-  });
+  NUTRIENTS.forEach((n) => {totals[n.dataKey] = 0;});
   return totals;
 }
 
-/**
- * Utility: given a "day" object from useTestData(),
- * sum all nutrients across its entries (taking servings into account).
- */
+//compute the totals for a single day 
+//then loop through each entry (food item) and multiply the values by the servings
 function computeDayTotals(day) {
+  //create an empty object with everything init to 0
   const totals = createEmptyTotals();
 
+  //loop through every food entry for the given day
   (day.entries || []).forEach((entry) => {
+    //get the number of servings for this food entry
+    //if servings is missing, default to 1
     const servings = entry?.consumed?.servings ?? 1;
 
+    //loop through every nutrient that are tracked (calories, protein, carbs, etc)
     NUTRIENTS.forEach((n) => {
+      //pull the nutrient value for this food: ex: entry.nutrients["protein_g"]
+      //if it's missing, default to 0
       const value = (entry?.nutrients?.[n.dataKey] || 0) * servings;
       totals[n.dataKey] += value;
     });
@@ -75,10 +138,8 @@ function computeDayTotals(day) {
   return totals;
 }
 
-/**
- * Utility: sum nutrient totals across many days.
- * Used for the big "Overview" row at the top.
- */
+//this function loops through each day, it also computes that day's total and then adds them to the daily total 
+//compute the totals across many days 
 function computeTotalsForDays(days) {
   const totals = createEmptyTotals();
 
@@ -92,65 +153,189 @@ function computeTotalsForDays(days) {
   return totals;
 }
 
-/**
- * Utility: read nutrientVisibility from localStorage.
- * We always merge with DEFAULT_VISIBILITY so missing keys default to true.
- */
+
+//this is from the browser's localStorage 
+//allows the UI to remember the user's preference even after reefreshinf or closing the page 
+//if anything goes wrong 
+//load visibily settings this allows the UI to remember the user's preference even
 function loadVisibilityFromStorage() {
+  //if window doesn't exist 
+  //we cannot access localStorage, so return defaults
   if (typeof window === "undefined") return DEFAULT_VISIBILITY;
 
+  //read the raw string stored under STORAGE_KEY.
+  //example: '{"calories":true,"protein":false}'
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
+    //if nothing is stored yet, use default visibility settings
     if (!raw) return DEFAULT_VISIBILITY;
 
+    //convert the JSON string back into an object
+    //raw --> parsed object
     const parsed = JSON.parse(raw);
+
+    //merge parsed values with defaults.
+    //this ensures any missing keys get default values.
     return { ...DEFAULT_VISIBILITY, ...parsed };
   } catch (e) {
-    console.error("Failed to load nutrientVisibility from localStorage", e);
+    //if JSON.parse fails or localStorage is corrupted,
+    //catch the error, log it, and safely return defaults
+    console.error("failed to load nutrientVisibility from localStorage", e);
     return DEFAULT_VISIBILITY;
   }
 }
 
-export default function History() {
-  // Test data hook from your project (same as used in graphs)
-  const data = useTestData();
-  const allDays = data ? data.days || [] : [];
+//compute %DV = amount / dailyValue * 100
+function getDailyValuePercent(logicalKey, amount) {
+  const dv = DAILY_VALUES[logicalKey];
+  if (!dv || amount == null) return null;
+  return (amount / dv) * 100;
+}
 
-  // Which tab is selected: all history or last 7 days
+//convert different timestamp shapes into a HH:MM label
+function getEntryTimeLabel(entry) {
+  const raw =
+    entry?.consumed?.time ??
+    entry?.consumed?.timestamp ??
+    entry?.timestamp ??
+    entry?.loggedAt ??
+    null;
+
+  if (!raw) return "";
+  const date = new Date(raw);
+
+  if (!isNaN(date.getTime())) {
+    return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  }
+  return typeof raw === "string" ? raw : "";
+}
+
+//converts the backend format into the local UI format
+function transformBackendDays(rawDays) {
+  //if the response is not an array, safely return an empty list
+  if (!Array.isArray(rawDays)) return [];
+
+  //map each backend "day" object into a new transformed "day" object
+  return rawDays.map((day) => {
+    //convert each food item (from backend) into a UI-friendly entry object
+    const entries = (day.foods || []).map((food) => {
+      //extract consumed info. If missing, default to an empty object
+      const consumed = food.consumed || {};
+      //use the logged servings; if missing, default to 1
+      const servings = consumed.servings ?? 1;
+
+      // Build nutrient mapping from backend IDs
+      const nutrientsObj = {};
+      //loop through all backend nutrients for this food
+      (food.nutrients || []).forEach((nut) => {
+        //find the matching nutrient definition from NUTRIENTS by nutrientId
+        const match = NUTRIENTS.find((n) => n.id === nut.nutrientId);
+        if (match) {
+          nutrientsObj[match.dataKey] = nut.amount ?? 0;
+        }
+      });
+
+      //return the transformed entry formatted exactly how the UI expects it
+      return {
+        //unique identifier for the food. Support both foodId and id
+        id: food.foodId ?? food.id,
+        name: food.description || food.name || "food",
+        nutrients: nutrientsObj,
+        consumed: {
+          servings,
+          time: consumed.time || consumed.timestamp || day.date,
+        },
+      };
+    });
+
+    return {
+      date: day.date || day.day || null,
+      entries,
+    };
+  });
+}
+
+
+//main component
+export default function History() {
+  //which tab is selected? ("all" or "last7")
   const [range, setRange] = useState("all");
 
-  // Nutrient visibility loaded from Settings
+
+  //compute which start/end dates to request from backend. useMemo ensures this only recalculates when range changes 
+  const { startDateIso, endDateIso } = useMemo(() => {
+    const today = new Date();
+    const todayStr = today.toISOString().slice(0, 10);
+
+    //up to tomorrow
+    const end = addDays(todayStr, 1); 
+    const start =
+      range === "last7"
+        ? addDays(todayStr, -7) // last 7 days
+        : addDays(todayStr, -30); // last 30 days for "all history"
+
+    return { startDateIso: start, endDateIso: end };
+  }, [range]);
+
+  //Fetch backend SQL history 
+  const backendRange = useRangeData(startDateIso, endDateIso);
+  const backendDays = transformBackendDays(backendRange || []);
+
+  //debug
+  console.log("backendRange raw:", backendRange);
+  console.log("backendDays transformed:", backendDays); 
+
+  //Test data fallback 
+  const testData = useTestData();
+  const testDays = testData ? testData.days || [] : [];
+
+  //Prefer backend if available; otherwise show placeholder data
+  const allDays =
+    backendDays.length > 0
+      ? backendDays
+      : Array.isArray(testDays)
+      ? testDays
+      : [];
+
+  //nutrient visibility (calories, protein, etc)
   const [visibility, setVisibility] = useState(DEFAULT_VISIBILITY);
 
-  // Load visibility once on mount
+  //Load visibility once on mount
   useEffect(() => {
     setVisibility(loadVisibilityFromStorage());
   }, []);
 
-  // Filter which days are visible based on the selected range
+
+  //visibleDays = days to display based on the selected tab even through backend already returns the righ range, we explicitly slice last 7 days to match UI logic
   const visibleDays = useMemo(() => {
     if (range === "last7") {
-      // assume test data is already in reverse-chronological order
       return allDays.slice(0, 7);
     }
     return allDays;
   }, [range, allDays]);
 
-  // Totals across all visible days for the top summary cards
-  const overviewTotals = useMemo(
-    () => computeTotalsForDays(visibleDays),
-    [visibleDays]
-  );
+  //compute totals and averages across visible days 
+  //useMemo ensures recalculation only when visibleDays change 
+  const { overviewTotals, overviewAverages } = useMemo(() => {
+    const totals = computeTotalsForDays(visibleDays);
+    const averages = createEmptyTotals();
+    const dayCount = visibleDays.length || 1;
 
-  // Whether calories are turned on in Settings (used for per-day header)
+    NUTRIENTS.forEach((n) => {
+      averages[n.dataKey] = totals[n.dataKey] / dayCount;
+    });
+
+    return { overviewTotals: totals, overviewAverages: averages };
+  }, [visibleDays]);
+
+  //whether to show calories as a top-line metric
   const caloriesVisible = visibility.calories !== false;
 
   return (
     <DefaultLayout>
-      {/* Outer page container.
-          mt-4 gives a little breathing room below the navbar */}
       <div className="max-w-6xl mx-auto px-4 py-6 mt-4 space-y-8">
-        {/*  HEADER + RANGE TABS  */}
+        
+        {/*HEADER */}
         <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-white">
@@ -162,7 +347,7 @@ export default function History() {
             </p>
           </div>
 
-          {/* Range tabs styled similar to the Day/Week/Month buttons */}
+          {/* Range selection buttons */}
           <div className="inline-flex rounded-full bg-default-50/10 p-1">
             {RANGE_OPTIONS.map((opt) => (
               <Button
@@ -181,11 +366,11 @@ export default function History() {
           </div>
         </header>
 
-        {/* OVERVIEW CARDS */}
+        {/* OVERVIEW  */}
         <section>
           <h2 className="text-sm font-semibold text-default-500 mb-3">
-            Overview ({visibleDays.length || 0} day
-            {visibleDays.length === 1 ? "" : "s"} selected)
+            Overview (averages over {visibleDays.length || 0} day
+            {visibleDays.length === 1 ? "" : "s"})
           </h2>
 
           {visibleDays.length === 0 ? (
@@ -195,10 +380,11 @@ export default function History() {
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {NUTRIENTS.map((n) => {
-                //skip cards for nutrients that are hidden in Settings
                 if (!visibility[n.logicalKey]) return null;
 
-                const value = overviewTotals[n.dataKey] || 0;
+                const avg = overviewAverages[n.dataKey] || 0;
+                const total = overviewTotals[n.dataKey] || 0;
+                const percentDV = getDailyValuePercent(n.logicalKey, avg);
 
                 return (
                   <div
@@ -210,15 +396,26 @@ export default function History() {
                         {n.label}
                       </span>
                       <span className="text-[11px] text-default-400">
-                        total
+                        avg / day
                       </span>
                     </div>
+
                     <div className="text-xl font-semibold text-white">
-                      {Math.round(value)}
+                      {Math.round(avg)}
                       {n.unit && (
                         <span className="ml-1 text-xs text-default-400">
                           {n.unit}
                         </span>
+                      )}
+                    </div>
+
+                    <div className="mt-1 flex items-center justify-between text-[11px] text-default-400">
+                      <span>
+                        Total: {Math.round(total)}
+                        {n.unit ? ` ${n.unit}` : ""}
+                      </span>
+                      {percentDV != null && (
+                        <span>{Math.round(percentDV)}% DV</span>
                       )}
                     </div>
                   </div>
@@ -228,7 +425,7 @@ export default function History() {
           )}
         </section>
 
-        {/* PER-DAY CARDS */}
+        {/*  DAILY DETAILS  */}
         <section className="space-y-4">
           <h2 className="text-sm font-semibold text-default-500">
             Daily details
@@ -253,7 +450,7 @@ export default function History() {
                   key={day.date}
                   className="rounded-2xl border border-default-100/40 bg-default-50 px-4 py-3 shadow-sm"
                 >
-                  {/*  Card header: date + total calories  */}
+                  {/* Header row: date, entry count, calories */}
                   <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-white">
@@ -275,43 +472,59 @@ export default function History() {
                     )}
                   </div>
 
-                  {/* Macro "pill" chips for visible non-calorie nutrients  */}
+                  {/* Chip badges showing nutrient totals */}
                   <div className="flex flex-wrap gap-2 mb-3 text-xs">
                     {NUTRIENTS.filter(
                       (n) =>
                         n.logicalKey !== "calories" &&
                         visibility[n.logicalKey]
-                    ).map((n) => (
-                      <div
-                        key={n.logicalKey}
-                        className="inline-flex items-center gap-1 rounded-full bg-default-100/10 border border-default-100/30 px-3 py-1"
-                      >
-                        <span className="text-default-500">{n.label}</span>
-                        <span className="font-semibold text-white">
-                          {Math.round(totals[n.dataKey] || 0)}
-                          {n.unit && (
-                            <span className="ml-0.5 text-[10px] text-default-400">
-                              {n.unit}
+                    ).map((n) => {
+                      const amount = totals[n.dataKey] || 0;
+                      const percentDV = getDailyValuePercent(
+                        n.logicalKey,
+                        amount
+                      );
+
+                      return (
+                        <div
+                          key={n.logicalKey}
+                          className="inline-flex items-center gap-1 rounded-full bg-default-100/10 border border-default-100/30 px-3 py-1"
+                        >
+                          <span className="text-default-500">{n.label}</span>
+                          <span className="font-semibold text-white">
+                            {Math.round(amount)}
+                            {n.unit && (
+                              <span className="ml-0.5 text-[10px] text-default-400">
+                                {n.unit}
+                              </span>
+                            )}
+                          </span>
+                          {percentDV != null && (
+                            <span className="ml-1 text-[10px] text-default-400">
+                              ({Math.round(percentDV)}% DV)
                             </span>
                           )}
-                        </span>
-                      </div>
-                    ))}
+                        </div>
+                      );
+                    })}
                   </div>
 
-                  {/* Entries table*/}
+                  {/* Food table */}
                   <div className="overflow-x-auto">
                     <table className="min-w-full text-xs">
-                      {/* table header: slightly lighter background to stand out */}
                       <thead className="border-b border-default-100/40 bg-default-100/10">
                         <tr>
                           <th className="px-2 py-1 text-left font-medium text-default-400">
                             Food
                           </th>
                           <th className="px-2 py-1 text-left font-medium text-default-400">
+                            Time
+                          </th>
+                          <th className="px-2 py-1 text-left font-medium text-default-400">
                             Servings
                           </th>
-                          {/* dynamic columns for any visible nutrient */}
+
+                          {/* Create a column for each visible nutrient */}
                           {NUTRIENTS.filter(
                             (n) => visibility[n.logicalKey]
                           ).map((n) => (
@@ -328,28 +541,28 @@ export default function History() {
                         </tr>
                       </thead>
 
-                      {/* body: brighter values + zebra striping */}
                       <tbody>
                         {entries.map((entry) => {
                           const servings = entry?.consumed?.servings ?? 1;
                           const nutrients = entry?.nutrients || {};
+                          const timeLabel = getEntryTimeLabel(entry);
 
                           return (
                             <tr
                               key={entry.id}
                               className="border-b border-default-100/20 odd:bg-default-50/40 even:bg-default-50/20 hover:bg-default-100/30 transition-colors"
                             >
-                              {/* Food name: brightest */}
                               <td className="px-2 py-1 text-white">
                                 {entry.name}
                               </td>
-
-                              {/* Servings: slightly dimmer but readable */}
+                              <td className="px-2 py-1 text-default-300">
+                                {timeLabel || "-"}
+                              </td>
                               <td className="px-2 py-1 text-default-300">
                                 {servings}
                               </td>
 
-                              {/* Nutrient numbers: brighter than before */}
+                              {/* Every visible nutrient is shown per food entry */}
                               {NUTRIENTS.filter(
                                 (n) => visibility[n.logicalKey]
                               ).map((n) => (
