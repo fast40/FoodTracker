@@ -41,7 +41,6 @@ public class Dashboard extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        JsonObject result = new JsonObject();
         PrintWriter out = response.getWriter();
 
         // @ Ian :D
@@ -70,18 +69,17 @@ public class Dashboard extends HttpServlet {
         Integer userID = Integer.parseInt(request.getParameter(userIDRequest));
 
         String limitParam = request.getParameter(entryLimitRequest);
-        // String tzParam = request.getParameter(timezoneRequest);
-        // ZoneId userZone = (tzParam != null) ? ZoneId.of(tzParam) : ZoneId.of("UTC");
-        ZoneId userZone = ZoneId.of("UTC");
-
-        System.out.println("Request with: " + mysql_start + " to " + mysql_end + " for user " + userID + " in timezone " + userZone);
+        String tzParam = request.getParameter(timezoneRequest);
+        ZoneId userZone = (tzParam != null) ? ZoneId.of(tzParam) : ZoneId.of("UTC");
 
         List<LogEntry> history;
         Integer entryLimit = (limitParam != null) ? Integer.parseInt(limitParam) : 100;
         try {
+            //get a log of all the foodIDs within the range
             history = historyDAO.GetHistory(userID, mysql_start, mysql_end, entryLimit);
             Map<LocalDate, DailyFoodLog> dailyFoodLog = new LinkedHashMap<>();
 
+            //for each foodID, get the associated FoodItem
             for (LogEntry log : history)  {
                 FoodItem item = foodDAO.getFoodById(log.foodId());
                 LocalDate localDate = log.date().toInstant().atZone(userZone).toLocalDate();
@@ -91,13 +89,11 @@ public class Dashboard extends HttpServlet {
             List<DailyFoodLog> dailyHistory = new ArrayList<>(dailyFoodLog.values());
             String json = gson.toJson(dailyHistory);
             out.write(json);        
-            result.addProperty("success", true);
 
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.write("{\"error\": \"Database error\"}");
-            result.addProperty("success", false);
         }
     }
 }

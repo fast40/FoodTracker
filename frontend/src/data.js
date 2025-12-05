@@ -1,21 +1,31 @@
+export const BASE_NUTRIENTS = [
+  { id: 1008, label: "Calories", settingsKey: "calories" },
+  { id: 1003, label: "Protein", settingsKey: "protein" },
+  { id: 1005, label: "Carbs", settingsKey: "carbs" },
+  { id: 1004, label: "Fat", settingsKey: "fat" },
+  { id: 1079, label: "Fiber", settingsKey: "fiber" },
+  { id: 1093, label: "Sodium", settingsKey: "sodium" },
+  { id: 2000, label: "Sugars", settingsKey: "sugars" },
+];
+
 export const DEFAULT_DV = {
-  energy_kcal: 2000,
-  protein_g: 50,
-  carbs_g: 275,
-  fat_g: 78,
-  fiber_g: 28,
-  sodium_mg: 2300,
-  sugars_g: 50,
+  1008: 2000,
+  1003: 50,
+  1005: 275,
+  1004: 78,
+  1079: 28,
+  1093: 2300,
+  2000: 50,
 };
 
 export const UNITS = {
-  energy_kcal: "kcal",
-  protein_g: "g",
-  carbs_g: "g",
-  fat_g: "g",
-  fiber_g: "g",
-  sodium_mg: "mg",
-  sugars_g: "g",
+  1008: "kcal",
+  1003: "g",
+  1005: "g",
+  1004: "g",
+  1079: "g",
+  1093: "mg",
+  2000: "g",
 };
 
 export const PALETTE = [

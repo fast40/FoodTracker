@@ -15,19 +15,9 @@ import {
   CartesianGrid,
   ReferenceLine,
 } from "recharts";
-import { DEFAULT_DV, UNITS, PALETTE } from "@/data";
+import { BASE_NUTRIENTS, DEFAULT_DV, UNITS, PALETTE } from "@/data";
 
 const STORAGE_KEY = "nutrientVisibility";
-
-const BASE_NUTRIENTS = [
-  { key: "energy_kcal", label: "Calories", settingsKey: "calories" },
-  { key: "protein_g", label: "Protein", settingsKey: "protein" },
-  { key: "carbs_g", label: "Carbs", settingsKey: "carbs" },
-  { key: "fat_g", label: "Fat", settingsKey: "fat" },
-  { key: "fiber_g", label: "Fiber", settingsKey: "fiber" },
-  { key: "sodium_mg", label: "Sodium", settingsKey: "sodium" },
-  { key: "sugars_g", label: "Sugars", settingsKey: "sugars" },
-];
 
 function loadVisibility() {
   if (typeof window === "undefined") return {};
@@ -48,14 +38,19 @@ function addDays(start, n) {
 
 export const DayGraph = () => {
 
-    const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-    const dayDate = useMemo(() => new Date(date).toISOString(), [date]);
+    const today = new Date();
+    const offset = new Date().getTimezoneOffset(); // in minutes
+    const localDate = new Date(today).getTime() - offset * 60000;
+
+    const [date, setDate] = useState(new Date(localDate).toISOString().slice(0, 10));
+    const startDate = useMemo(() => new Date(date).toISOString(), [date]);
+    const endDate = useMemo(() => addDays(new Date(date), 1), [date]);
 
     // Get nutrient data via the dashboardData hook
-    //const rawData = useTestData();
-    const rawData = useRangeData(dayDate, addDays(dayDate, 365));
-    const day = rawData ? rawData.days[0] : [];
-    const entries = day ? day.entries : [];
+    const rawData = useRangeData(startDate, endDate);
+    //console.log(JSON.stringify(rawData, null, 2));
+    const day = rawData ? rawData[0] : [];
+    const entries = day ? day.foods : [];
 
     const navigate = useNavigate();
 
@@ -67,29 +62,36 @@ export const DayGraph = () => {
             const flag = visibility[n.settingsKey];
             return flag === undefined ? true : !!flag;
         });
-        return filtered.map((n) => ({ key: n.key, label: n.label }));
+        return filtered.map((n) => ({ id: n.id, label: n.label }));
     }, []);
 
     const foods = (entries || []).map((e, i) => ({
-        id: e.id || String(i),
-        name: e.name,
-        color: PALETTE[i % PALETTE.length],
+        id: e.foodId || String(i),
+        name: e.description,
+    }));
+
+    const foodsSorted = [...foods]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((f, idx) => ({
+        ...f,
+        color: PALETTE[idx % PALETTE.length],
     }));
 
     // Build stacked data rows: one row per nutrient, columns per food id with %DV values
     const data = useMemo(() => {
-    const rows = nutrients.map((n) => ({ name: n.label, nutrientKey: n.key }));
+    const rows = nutrients.map((n) => ({ name: n.label, nutrientId: n.id }));
     (entries || []).map((e, i) => {
         const foodId = foods[i]?.id;
         if (!foodId) return;
         const factor = e?.consumed?.servings ?? 1;
 
         nutrients.forEach((n) => {
-            const abs = ((e?.nutrients || {})[n.key] || 0) * factor;
-            const dv = DEFAULT_DV[n.key] || 0;
+            const nutrient = e?.nutrients?.find((nut) => nut.nutrientId === n.id);
+            const abs = (nutrient?.amount || 0) * factor;
+            const dv = DEFAULT_DV[n.id] || 0;
             const uncappedPct = dv ? Math.max(0, (abs / dv) * 100) : 0;
             const pct = Math.min(100, uncappedPct);
-            const row = rows.find((r) => r.nutrientKey === n.key) || {};
+            const row = rows.find((r) => r.nutrientId === n.id) || {};
             row[foodId] = pct;
             row[`${foodId}__abs`] = abs;
             row.totalPctUncapped = (row.totalPctUncapped || 0) + uncappedPct;
@@ -98,12 +100,13 @@ export const DayGraph = () => {
     return rows;
     }, [entries, nutrients, foods]);
 
+
     // Tooltip: show absolute values with units for the hovered nutrient
     function ValueTooltip({ active, payload, label }) {
         if (!active || !payload?.length) return null;
         const row = data.find((d) => d.name === label);
-        const nutrientKey = row?.nutrientKey;
-        const unit = nutrientKey ? UNITS[nutrientKey] || "" : "";
+        const nutrientId = row?.nutrientId;
+        const unit = nutrientId ? UNITS[nutrientId] || "" : "";
         return (
             <div className="rounded-medium border bg-background p-2 text-sm">
                 <div className="font-medium mb-1">{label}</div>
@@ -128,6 +131,36 @@ export const DayGraph = () => {
             </div>
         );
     }
+
+    function CustomLegend({payload}) {
+        return (
+            <div
+            style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "12px",
+                marginTop: "12px",
+                marginLeft: "120px",
+            }}
+            >   
+            {payload.map((entry) => (
+                <div key={entry.value} style={{ display: "flex", alignItems: "center", marginLeft: "10px"}}>
+                    <span
+                        style={{
+                        display: "inline-block",
+                        width: 12,
+                        height: 12,
+                        background: entry.color,
+                        marginRight: 6,
+                        }}
+                    />
+                    {entry.value}
+                </div>
+            ))}
+            </div>
+        );
+    }
+
     //Bool to determine whether reference line is drawn at 100%
     const anyOver100 = data.some(r => (r.totalPctUncapped || 0) > 100);
 
@@ -138,8 +171,8 @@ export const DayGraph = () => {
             {/* Header buttons */}
             <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center">
-                    <Button className="rounded-l-lg rounded-r-none text-xl font-semibold min-w-5" style={{ background: "rgb(40, 40, 40)" }}>&lt;</Button>
-                    <Button className="rounded-l-none rounded-r-lg text-xl font-semibold min-w-5" style={{ background: "rgb(40, 40, 40)" }}>&gt;</Button>
+                    <Button onPress={() => setDate(addDays(date, -1).slice(0, 10))} className="rounded-l-lg rounded-r-none text-xl font-semibold min-w-5" style={{ background: "rgb(40, 40, 40)" }}>&lt;</Button>
+                    <Button onPress={() => setDate(addDays(date, 1).slice(0, 10))} className="rounded-l-none rounded-r-lg text-xl font-semibold min-w-5" style={{ background: "rgb(40, 40, 40)" }}>&gt;</Button>
                 </div>
                 <div className="flex items-center gap-3">
                     <DatePicker
@@ -170,7 +203,7 @@ export const DayGraph = () => {
                     }}
                 />
                 <Tooltip content={<ValueTooltip />} />
-                <Legend />
+                <Legend content={CustomLegend} />
 
                 {anyOver100 && (
                 <ReferenceLine
@@ -181,7 +214,7 @@ export const DayGraph = () => {
                 />
                 )}
 
-                {foods.map((f) => (
+                {foodsSorted.map((f) => (
                 <Bar
                     key={f.id}
                     dataKey={f.id}

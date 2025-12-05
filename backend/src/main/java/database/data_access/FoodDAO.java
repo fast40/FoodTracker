@@ -1,6 +1,7 @@
 package database.data_access;
 
 import database.helpers.Enumerations;
+import database.helpers.Enumerations.NutrientType;
 import database.wrappers.FoodItem;
 import database.wrappers.Nutrient;
 
@@ -29,6 +30,7 @@ public class FoodDAO {
                 food.setServingSize(rs.getFloat("serving_size"));
                 food.setServingSizeUnit(rs.getString("serving_size_unit"));
                 food.setHouseholdServingFullText(rs.getString("household_serving_full_text"));
+                food.setNutrients(GetNutrients(food_id));
 
                 Integer createdBy = rs.getObject("created_by", Integer.class);
                 food.setCreatorID(createdBy);
@@ -187,11 +189,12 @@ public class FoodDAO {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Integer nutrientID = rs.getInt("nutrient_id");
-                String name  = Enumerations.NutrientType.values()[nutrientID].getName();
+                String name = NutrientType.fromId(nutrientID).getName();
                 // nutrient number is being ignored right now becuase I dont want to do a third lookup
                 String nutrientNumber = "";
                 Float amount = rs.getFloat("amount");
-                String unitName = rs.getString("unit_name");
+                String unitName = "no units";
+                //String unitName = rs.getString("unit_name");
 
                 Nutrient nutrient = new Nutrient(nutrientID, name, nutrientNumber, amount, unitName);
                 nutrients.add(nutrient);

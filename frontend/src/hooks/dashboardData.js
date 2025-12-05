@@ -1,9 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // Fetches from the /api/dashboard servlet to get values for a given date range
 // @return: list of days (each has foods, each with nutrient values, name, and servings)
-export function useRangeData(startDate, endDate) {
+export function useRangeData(start, end) {
+
+  const offset = new Date().getTimezoneOffset(); // in minutes
+  const startDate = new Date(new Date(start).getTime() + offset * 60000).toISOString();
+  const endDate = new Date(new Date(end).getTime() + offset * 60000).toISOString();
+
+  const [data, setData] = useState([]);
+
   useEffect(() => {
+
     async function load() {
       try {
         const params = new URLSearchParams({
@@ -18,15 +26,7 @@ export function useRangeData(startDate, endDate) {
           throw new Error("Request failed");
 
         const json = await res.json();
-        //if (!json.success)
-        //  throw new Error("Missing data");
-
-        console.log(JSON.stringify(json, null, 2));
-        json.forEach(entry => {
-          entry.foods.forEach(food => {
-            console.log(food.nutrients.length);
-          });
-        });
+        setData(json);
 
       } catch (err) {
         console.log("ERROR fetching from /api/dashboard: " + err.message);
@@ -34,9 +34,10 @@ export function useRangeData(startDate, endDate) {
     }
 
     load();
-  }, []);
+  }, [startDate, endDate]);
 
-  return useTestData();
+  return data;
+  //return useTestData();
 }
 
 
