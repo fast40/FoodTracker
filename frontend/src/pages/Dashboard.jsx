@@ -27,18 +27,18 @@ export default function Dashboard() {
         onClick={() => setView("week")}
         color = {view === "week" ? "primary" : "default"}
         style = {{ color: view === "week" ? "white" : "gray"}}
-        className="rounded-none"
+        className="rounded-l-none rounded-r-lg"
       >
         Week
       </Button>
-      <Button
+      {/*<Button
         onClick={() => setView("month")}
         color = {view === "month" ? "primary" : "default"}
         style = {{ color: view === "month" ? "white" : "gray"}}
         className="rounded-l-none rounded-r-lg"
       >
         Month
-      </Button>
+      </Button>*/}
 
       {view === "day" && <DayGraph />}
       {view === "week" && <RangeGraph />}

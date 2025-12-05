@@ -1,5 +1,4 @@
 /* eslint-disable */
-import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 import {
   Navbar as HeroUINavbar,
@@ -14,9 +13,7 @@ import { link as linkStyles } from "@heroui/theme";
 import clsx from "clsx";
 
 import { siteConfig } from "@/site-config";
-//import { ThemeSwitch } from "@/components/theme-switch";
-//import { Logo } from "@/components/icons";
-import { useEffect, useState, Fragment } from "react";
+import { useState, Fragment } from "react";
 import { useAuth } from "../context/AuthContext";
 
 export const Navbar = () => {
