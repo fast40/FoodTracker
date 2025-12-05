@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Form, Input, Button } from "@heroui/react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Register()
 {
@@ -11,6 +12,9 @@ export default function Register()
     email: "",
     password: ""
   });
+
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -21,6 +25,9 @@ export default function Register()
       credentials: 'include',
       body: JSON.stringify(formData)
     });
+
+    login(formData);
+    navigate("/");
   }
 
   return (

@@ -5,7 +5,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -64,7 +63,6 @@ public class Register extends HttpServlet {
                         addUser.executeUpdate();
                         addRole.executeUpdate();
 
-                        request.login(registerForm.username, registerForm.password);
                         System.out.printf("username: %s email: %s password: %s\n", registerForm.username, registerForm.email, registerForm.password);
 
                         // TODO: return some json (success)

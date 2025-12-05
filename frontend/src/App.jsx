@@ -7,6 +7,7 @@ import History from "@/pages/History"
 import Login from "@/pages/Login"
 import Register from "@/pages/Register"
 import Settings from "@/pages/Settings";
+import Logout from "@/pages/Logout";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route element={<AddFood />} path="/add" />
       <Route element={<History />} path="/history" />
       <Route element={<Login />} path="/login" />
+      <Route element={<Logout />} path="/logout" />
       <Route element={<Register />} path="/register" />
       <Route element={<Settings />} path="/settings" />
     </Routes>
