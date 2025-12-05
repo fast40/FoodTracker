@@ -5,14 +5,13 @@ export const siteConfig = {
   description: "Track daily nutrients with barcode scans and charts.",
   navLeft: [
     {
-      label: "Dashboard",
-      href: "/dashboard",
-      show: "always",
-    },
-    {
       label: "Add Food",
       href: "/add",
       show: "always",
+    },
+    {
+      label: "Dashboard",
+      href: "/dashboard",
     },
     {
       label: "History",
@@ -44,14 +43,13 @@ export const siteConfig = {
   ],
   navMenu: [
     {
-      label: "Dashboard",
-      href: "/dashboard",
-      show: "always",
-    },
-    {
       label: "Add Food",
       href: "/add",
       show: "always",
+    },
+    {
+      label: "Dashboard",
+      href: "/dashboard",
     },
     {
       label: "History",

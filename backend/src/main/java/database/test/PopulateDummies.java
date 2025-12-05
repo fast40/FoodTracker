@@ -280,6 +280,88 @@ public class PopulateDummies {
         logEntry(foodIds.get(6), threeDaysAgo.minus(9, ChronoUnit.HOURS)); // Eggs
         logEntry(foodIds.get(5), threeDaysAgo.minus(5, ChronoUnit.HOURS)); // Banana
         logEntry(foodIds.get(4), threeDaysAgo.minus(2, ChronoUnit.HOURS)); // Salmon
+
+        // 4 days ago
+        Instant fourDaysAgo = now.minus(4, ChronoUnit.DAYS);
+        logEntry(foodIds.get(7), fourDaysAgo.minus(11, ChronoUnit.HOURS)); // Oatmeal
+        logEntry(foodIds.get(0), fourDaysAgo.minus(8, ChronoUnit.HOURS));  // Apple
+        logEntry(foodIds.get(1), fourDaysAgo.minus(5, ChronoUnit.HOURS));  // Chicken
+        logEntry(foodIds.get(2), fourDaysAgo.minus(5, ChronoUnit.HOURS));  // Brown Rice
+        logEntry(foodIds.get(1), fourDaysAgo.minus(2, ChronoUnit.HOURS));  // Chicken
+        logEntry(foodIds.get(3), fourDaysAgo.minus(2, ChronoUnit.HOURS));  // Broccoli
+
+        // 5 days ago
+        Instant fiveDaysAgo = now.minus(5, ChronoUnit.DAYS);
+        logEntry(foodIds.get(6), fiveDaysAgo.minus(10, ChronoUnit.HOURS)); // Eggs
+        logEntry(foodIds.get(5), fiveDaysAgo.minus(7, ChronoUnit.HOURS));  // Banana
+        logEntry(foodIds.get(4), fiveDaysAgo.minus(4, ChronoUnit.HOURS));  // Salmon
+        logEntry(foodIds.get(0), fiveDaysAgo.minus(2, ChronoUnit.HOURS));  // Apple
+        logEntry(foodIds.get(0), fiveDaysAgo.minus(2, ChronoUnit.HOURS));  // Apple
+        logEntry(foodIds.get(0), fiveDaysAgo.minus(2, ChronoUnit.HOURS));  // Apple
+
+        // 6 days ago
+        Instant sixDaysAgo = now.minus(6, ChronoUnit.DAYS);
+        logEntry(foodIds.get(7), sixDaysAgo.minus(12, ChronoUnit.HOURS)); // Oatmeal
+        logEntry(foodIds.get(2), sixDaysAgo.minus(12, ChronoUnit.HOURS));  // Brown Rice
+        logEntry(foodIds.get(1), sixDaysAgo.minus(7, ChronoUnit.HOURS));  // Chicken
+        logEntry(foodIds.get(2), sixDaysAgo.minus(7, ChronoUnit.HOURS));  // Brown Rice
+        logEntry(foodIds.get(3), sixDaysAgo.minus(3, ChronoUnit.HOURS));  // Broccoli
+        logEntry(foodIds.get(2), sixDaysAgo.minus(2, ChronoUnit.HOURS));  // Brown Rice
+        logEntry(foodIds.get(5), sixDaysAgo.minus(1, ChronoUnit.HOURS));  // Banana
+
+        // 7 days ago
+        Instant sevenDaysAgo = now.minus(7, ChronoUnit.DAYS);
+        logEntry(foodIds.get(6), sevenDaysAgo.minus(9, ChronoUnit.HOURS));  // Eggs
+        logEntry(foodIds.get(4), sevenDaysAgo.minus(6, ChronoUnit.HOURS));  // Salmon
+        logEntry(foodIds.get(0), sevenDaysAgo.minus(3, ChronoUnit.HOURS));  // Apple
+        logEntry(foodIds.get(7), sevenDaysAgo.minus(1, ChronoUnit.HOURS));  // Oatmeal
+
+        // 8 days ago
+        Instant eightDaysAgo = now.minus(8, ChronoUnit.DAYS);
+        logEntry(foodIds.get(5), eightDaysAgo.minus(11, ChronoUnit.HOURS)); // Banana
+        logEntry(foodIds.get(7), eightDaysAgo.minus(8, ChronoUnit.HOURS));  // Oatmeal
+        logEntry(foodIds.get(1), eightDaysAgo.minus(4, ChronoUnit.HOURS));  // Chicken
+        logEntry(foodIds.get(2), eightDaysAgo.minus(4, ChronoUnit.HOURS));  // Brown Rice
+        logEntry(foodIds.get(3), eightDaysAgo.minus(2, ChronoUnit.HOURS));  // Broccoli
+        logEntry(foodIds.get(4), eightDaysAgo.minus(1, ChronoUnit.HOURS));  // Salmon
+
+        // 9 days ago
+        Instant nineDaysAgo = now.minus(9, ChronoUnit.DAYS);
+        logEntry(foodIds.get(0), nineDaysAgo.minus(10, ChronoUnit.HOURS)); // Apple
+        logEntry(foodIds.get(6), nineDaysAgo.minus(7, ChronoUnit.HOURS));  // Eggs
+        logEntry(foodIds.get(5), nineDaysAgo.minus(5, ChronoUnit.HOURS));  // Banana
+        logEntry(foodIds.get(4), nineDaysAgo.minus(3, ChronoUnit.HOURS));  // Salmon
+
+        // 10 days ago
+        Instant tenDaysAgo = now.minus(10, ChronoUnit.DAYS);
+        logEntry(foodIds.get(7), tenDaysAgo.minus(12, ChronoUnit.HOURS)); // Oatmeal
+        logEntry(foodIds.get(2), tenDaysAgo.minus(8, ChronoUnit.HOURS));  // Brown Rice
+        logEntry(foodIds.get(1), tenDaysAgo.minus(6, ChronoUnit.HOURS));  // Chicken
+        logEntry(foodIds.get(3), tenDaysAgo.minus(4, ChronoUnit.HOURS));  // Broccoli
+        logEntry(foodIds.get(0), tenDaysAgo.minus(2, ChronoUnit.HOURS));  // Apple
+
+        // 11 days ago
+        Instant elevenDaysAgo = now.minus(11, ChronoUnit.DAYS);
+        logEntry(foodIds.get(6), elevenDaysAgo.minus(9, ChronoUnit.HOURS)); // Eggs
+        logEntry(foodIds.get(4), elevenDaysAgo.minus(6, ChronoUnit.HOURS)); // Salmon
+        logEntry(foodIds.get(5), elevenDaysAgo.minus(6, ChronoUnit.HOURS)); // Banana
+        logEntry(foodIds.get(4), elevenDaysAgo.minus(3, ChronoUnit.HOURS)); // Salmon
+        logEntry(foodIds.get(7), elevenDaysAgo.minus(1, ChronoUnit.HOURS)); // Oatmeal
+
+        // 12 days ago
+        Instant twelveDaysAgo = now.minus(12, ChronoUnit.DAYS);
+        logEntry(foodIds.get(1), twelveDaysAgo.minus(11, ChronoUnit.HOURS)); // Chicken
+        logEntry(foodIds.get(2), twelveDaysAgo.minus(7, ChronoUnit.HOURS));  // Brown Rice
+        logEntry(foodIds.get(3), twelveDaysAgo.minus(4, ChronoUnit.HOURS));  // Broccoli
+        logEntry(foodIds.get(0), twelveDaysAgo.minus(2, ChronoUnit.HOURS));  // Apple
+        logEntry(foodIds.get(6), twelveDaysAgo.minus(1, ChronoUnit.HOURS));  // Eggs
+
+        // 13 days ago
+        Instant thirteenDaysAgo = now.minus(13, ChronoUnit.DAYS);
+        logEntry(foodIds.get(7), thirteenDaysAgo.minus(10, ChronoUnit.HOURS)); // Oatmeal
+        logEntry(foodIds.get(5), thirteenDaysAgo.minus(7, ChronoUnit.HOURS));  // Banana
+        logEntry(foodIds.get(4), thirteenDaysAgo.minus(4, ChronoUnit.HOURS));  // Salmon
+        logEntry(foodIds.get(2), thirteenDaysAgo.minus(3, ChronoUnit.HOURS));  // Brown Rice
     }
 
     private void logEntry(Integer foodId, Instant timestamp) {

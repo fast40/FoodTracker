@@ -9,4 +9,4 @@ docker container remove mysql
 # docker run --name mysql -p 3306:3306 -v ./setup:/docker-entrypoint-initdb.d -v ./mysql:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=food_tracker mysql
 
 # This just restarts the container from a blank slate every time
-docker run --name mysql -p 3306:3306 -v ./setup:/docker-entrypoint-initdb.d -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=food_tracker mysql
+docker run --name mysql -p 3307:3306 -v ./setup:/docker-entrypoint-initdb.d -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=food_tracker mysql

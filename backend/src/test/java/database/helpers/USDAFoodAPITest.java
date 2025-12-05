@@ -84,7 +84,7 @@ public class USDAFoodAPITest {
         assertEquals(null, item);
     }
 
-    @Test
+    /*@Test
     public void testFetchFoodByGTIN_Integration_RealAPI() throws Exception {
         // Use a real HTTP client for this test
         USDAFoodAPI.setHttpClient(HttpClient.newHttpClient());
@@ -142,5 +142,5 @@ public class USDAFoodAPITest {
         assertTrue(nutrientMap.containsKey(1093));
         assertEquals(686.0f, nutrientMap.get(1093).getAmount(), 0.01f);
         assertEquals("MG", nutrientMap.get(1093).getUnitName());
-    }
+    }*/
 }

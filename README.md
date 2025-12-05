@@ -1,8 +1,6 @@
-# Getting Started
-
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
-
 # Development
+
+A brief guide to setting up the project and running it on your machine.
 
 ## Backend
 
@@ -32,7 +30,32 @@ mvn test
 
 - [ ] Integrate the front end. Build the front end and copy the output during maven build.
 
-### Using Eclipse
+
+## Commands
+
+To start the frontend:
+```sh
+cd frontend
+npm run dev
+```
+The project will be running at http://localhost:5173/
+
+To start the MySQL server:
+```sh
+cd backend/src/main/mysql
+./mysql.sh
+```
+
+To run test MySQL queries:
+```sh
+docker exec -it mysql /bin/mysql -u root -p
+root (asks you to enter a password)
+USE food_tracker
+[whatever query you want]
+```
+
+
+## Using Eclipse
 
 > [!WARNING]
 > The following section is outdated after the migration to maven, and needs to be updated.

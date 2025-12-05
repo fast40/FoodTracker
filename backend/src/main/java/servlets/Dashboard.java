@@ -24,8 +24,8 @@ import com.google.gson.JsonObject;
 
 @WebServlet("/api/dashboard")
 public class Dashboard extends HttpServlet {
-    final String startRequest = "start"; //TODO - Ian define request parameter names here
-    final String endRequest = "end"; // TODO - This one too
+    final String startRequest = "startDate";
+    final String endRequest = "endDate";
     final String userIDRequest = "userID";
     final String entryLimitRequest = "entryLimit";
     final String timezoneRequest = "timezone";
@@ -41,7 +41,6 @@ public class Dashboard extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        JsonObject result = new JsonObject();
         PrintWriter out = response.getWriter();
 
         // @ Ian :D
@@ -51,8 +50,6 @@ public class Dashboard extends HttpServlet {
             end timestamp // ISO 8601 Standard
             timezone // IANA timezone identifier
          */
-
-        result.addProperty("success", true); // why is this here so early -sid
 
         // read start date and end date from request
         // ISO 8601 Standard Timestamps
@@ -75,13 +72,14 @@ public class Dashboard extends HttpServlet {
         String tzParam = request.getParameter(timezoneRequest);
         ZoneId userZone = (tzParam != null) ? ZoneId.of(tzParam) : ZoneId.of("UTC");
 
-
         List<LogEntry> history;
         Integer entryLimit = (limitParam != null) ? Integer.parseInt(limitParam) : 100;
         try {
+            //get a log of all the foodIDs within the range
             history = historyDAO.GetHistory(userID, mysql_start, mysql_end, entryLimit);
             Map<LocalDate, DailyFoodLog> dailyFoodLog = new LinkedHashMap<>();
 
+            //for each foodID, get the associated FoodItem
             for (LogEntry log : history)  {
                 FoodItem item = foodDAO.getFoodById(log.foodId());
                 LocalDate localDate = log.date().toInstant().atZone(userZone).toLocalDate();
@@ -90,30 +88,12 @@ public class Dashboard extends HttpServlet {
 
             List<DailyFoodLog> dailyHistory = new ArrayList<>(dailyFoodLog.values());
             String json = gson.toJson(dailyHistory);
-            out.write(json);
+            out.write(json);        
 
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.write("{\"error\": \"Database error\"}");
         }
-
-        //placeholder values to test but the values should be listed generically in nested json objects
-        /*
-        result.addProperty("calories", 800);
-        result.addProperty("protein", 30);
-        result.addProperty("carbohydrates", 222);
-        result.addProperty("fat", 14);
-        result.addProperty("sugar", 22);
-        result.addProperty("fiber", 12);
-        result.addProperty("sodium", 1200);
-
-        response.setContentType("application/json");
-        response.getWriter().write(result.toString());
-        */
-
-
-        //response.setContentType("text/html;charset=UTF-8");
-        //response.getWriter().println("show data viz page.");
     }
 }

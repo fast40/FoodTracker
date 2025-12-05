@@ -44,7 +44,7 @@ public class HistoryDAO {
         List<LogEntry> history = new ArrayList<>();
         String query = "SELECT * FROM food_logs WHERE user_id = ? AND log_date BETWEEN ? AND ? ORDER BY log_date DESC LIMIT ?";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+            PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, UserID);
             stmt.setTimestamp(2, start);
             stmt.setTimestamp(3, end);

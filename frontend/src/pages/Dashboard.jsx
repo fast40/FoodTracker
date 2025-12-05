@@ -5,11 +5,18 @@ import { DayGraph } from "@/components/dayGraph";
 import { RangeGraph } from "@/components/rangeGraph";
 
 import { Button } from "@heroui/react";
-import { color } from "framer-motion";
 
 
 export default function Dashboard() {
+  
+  const today = new Date();
+  const offset = new Date().getTimezoneOffset(); // in minutes
+  const localDate = new Date(today).getTime() - offset * 60000;
+
+  const [date, setDate] = useState(new Date(localDate).toISOString().slice(0, 10));
+
   const [view, setView] = useState("day");
+
 
   return (
     <DefaultLayout>
@@ -27,22 +34,22 @@ export default function Dashboard() {
         onClick={() => setView("week")}
         color = {view === "week" ? "primary" : "default"}
         style = {{ color: view === "week" ? "white" : "gray"}}
-        className="rounded-none"
+        className="rounded-l-none rounded-r-lg"
       >
         Week
       </Button>
-      <Button
+      {/*<Button
         onClick={() => setView("month")}
         color = {view === "month" ? "primary" : "default"}
         style = {{ color: view === "month" ? "white" : "gray"}}
         className="rounded-l-none rounded-r-lg"
       >
         Month
-      </Button>
+      </Button>*/}
 
-      {view === "day" && <DayGraph />}
-      {view === "week" && <RangeGraph />}
-      {view === "month" && <RangeGraph />}
+      {view === "day" && <DayGraph date={date} setDate={setDate} />}
+      {view === "week" && <RangeGraph date={date} setDate={setDate} />}
+      {/*{view === "month" && <RangeGraph />}*/}
     </DefaultLayout>
   );
 }

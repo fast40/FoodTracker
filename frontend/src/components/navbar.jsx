@@ -1,5 +1,4 @@
 /* eslint-disable */
-import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 import {
   Navbar as HeroUINavbar,
