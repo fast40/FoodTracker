@@ -1,4 +1,4 @@
-import { useDayData } from "@/hooks/dashboardData";
+import { useRangeData } from "@/hooks/dashboardData";
 import { useTestData } from "@/hooks/dashboardData";
 import { useMemo, useState } from "react";
 import { Button, DatePicker } from "@heroui/react";
@@ -40,15 +40,20 @@ function loadVisibility() {
   }
 }
 
+function addDays(start, n) {
+  const d = new Date(start);
+  d.setDate(d.getDate() + n);
+  return d.toISOString();
+}
+
 export const DayGraph = () => {
 
     const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-    const dayDate = useMemo(() => new Date(date), [date]);
+    const dayDate = useMemo(() => new Date(date).toISOString(), [date]);
 
     // Get nutrient data via the dashboardData hook
-    // - useDayData(dayDate) to fetch from tomcat server
-    // - useTestData() for local placeholder values
-    const rawData = useTestData();
+    //const rawData = useTestData();
+    const rawData = useRangeData(dayDate, addDays(dayDate, 365));
     const day = rawData ? rawData.days[0] : [];
     const entries = day ? day.entries : [];
 

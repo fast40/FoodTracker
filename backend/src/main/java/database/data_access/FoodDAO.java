@@ -143,7 +143,7 @@ public class FoodDAO {
     }
 
     public boolean insertNutrientsByFood(int foodId, List<Nutrient> nutrients) {
-        String sql = "INSERT INTO food_nutrients (food_id, nutrient_id, amount) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO food_nutrient_values (food_id, nutrient_id, amount) VALUES (?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

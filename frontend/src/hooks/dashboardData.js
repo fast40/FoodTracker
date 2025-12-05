@@ -1,63 +1,42 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-// Fetches from the /api/dashboard servlet to get values for a given day
-// @return: list of days with 1 index (each has foods, each with nutrient values, name, and servings)
-export function useDayData(dayDate) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
+// Fetches from the /api/dashboard servlet to get values for a given date range
+// @return: list of days (each has foods, each with nutrient values, name, and servings)
+export function useRangeData(startDate, endDate) {
   useEffect(() => {
     async function load() {
       try {
-        //TODO: add dayDate to request
-        const res = await fetch("http://localhost:8080/food-tracker/api/dashboard");
+        const params = new URLSearchParams({
+          startDate,
+          endDate,
+          userID: 456, //TODO: get actual user data - wait for Advait's user servlet?
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        });
+
+        const res = await fetch(`http://localhost:8080/food-tracker/api/dashboard?${params.toString()}`);
         if (!res.ok)
           throw new Error("Request failed");
 
         const json = await res.json();
-        if (!json.success)
-          throw new Error("Missing data");
+        //if (!json.success)
+        //  throw new Error("Missing data");
 
-        setData({
-          days: [
-            {
-            date: dayDate,
-            entries: [
-              {
-                id: "1",
-                name: "Test Data",
-                consumed: { servings: 1 },
-                nutrients: {
-                  energy_kcal: json.calories,
-                  protein_g: json.protein,
-                  carbs_g: json.carbohydrates,
-                  fat_g: json.fat,
-                  sugars_g: json.sugar,
-                  fiber_g: json.fiber,
-                  sodium_mg: json.sodium
-                }
-              }
-            ]},
-          ]
+        console.log(JSON.stringify(json, null, 2));
+        json.forEach(entry => {
+          entry.foods.forEach(food => {
+            console.log(food.nutrients.length);
+          });
         });
 
       } catch (err) {
-        console.log("ERROR fetching from /api/dashboard:" + err.message);
+        console.log("ERROR fetching from /api/dashboard: " + err.message);
       }
     }
 
     load();
   }, []);
 
-  return data;
-}
-
-
-// Fetches from the /api/dashboard servlet to get values for a given date range (week or month)
-// @return: list of days (each has foods, each with nutrient values, name, and servings)
-export function useRangeData(startDate, endDate) {
-  
+  return useTestData();
 }
 
 

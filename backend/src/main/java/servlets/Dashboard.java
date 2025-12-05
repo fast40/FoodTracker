@@ -24,8 +24,8 @@ import com.google.gson.JsonObject;
 
 @WebServlet("/api/dashboard")
 public class Dashboard extends HttpServlet {
-    final String startRequest = "start"; //TODO - Ian define request parameter names here
-    final String endRequest = "end"; // TODO - This one too
+    final String startRequest = "startDate";
+    final String endRequest = "endDate";
     final String userIDRequest = "userID";
     final String entryLimitRequest = "entryLimit";
     final String timezoneRequest = "timezone";
@@ -52,8 +52,6 @@ public class Dashboard extends HttpServlet {
             timezone // IANA timezone identifier
          */
 
-        result.addProperty("success", true); // why is this here so early -sid
-
         // read start date and end date from request
         // ISO 8601 Standard Timestamps
         // YYYY-MM-DDTHH:mm:ss.sssZ or YYYY-MM-DDTHH:mm:ss.sss±HH:mm
@@ -75,6 +73,7 @@ public class Dashboard extends HttpServlet {
         String tzParam = request.getParameter(timezoneRequest);
         ZoneId userZone = (tzParam != null) ? ZoneId.of(tzParam) : ZoneId.of("UTC");
 
+        System.out.println("Request with: " + mysql_start + " to " + mysql_end + " for user " + userID + " in timezone " + userZone);
 
         List<LogEntry> history;
         Integer entryLimit = (limitParam != null) ? Integer.parseInt(limitParam) : 100;
@@ -90,30 +89,14 @@ public class Dashboard extends HttpServlet {
 
             List<DailyFoodLog> dailyHistory = new ArrayList<>(dailyFoodLog.values());
             String json = gson.toJson(dailyHistory);
-            out.write(json);
+            out.write(json);        
+            result.addProperty("success", true);
 
         } catch (SQLException e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.write("{\"error\": \"Database error\"}");
+            result.addProperty("success", false);
         }
-
-        //placeholder values to test but the values should be listed generically in nested json objects
-        /*
-        result.addProperty("calories", 800);
-        result.addProperty("protein", 30);
-        result.addProperty("carbohydrates", 222);
-        result.addProperty("fat", 14);
-        result.addProperty("sugar", 22);
-        result.addProperty("fiber", 12);
-        result.addProperty("sodium", 1200);
-
-        response.setContentType("application/json");
-        response.getWriter().write(result.toString());
-        */
-
-
-        //response.setContentType("text/html;charset=UTF-8");
-        //response.getWriter().println("show data viz page.");
     }
 }
