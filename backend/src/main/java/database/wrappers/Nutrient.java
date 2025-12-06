@@ -29,6 +29,7 @@ public class Nutrient {
     public String getName() { return name; }
     public String getNumber() { return number; }
     public void setNutrientNumber(String nutrient) {number = nutrient;}
+    public void setAmount(float amount) {this.amount = amount;}
     public float getAmount() { return amount; }
     public String getUnitName() { return unitName; }
 }

@@ -14,7 +14,7 @@ public class DailyFoodLog {
         this.foods = new ArrayList<FoodItem>();
     }
 
-    public void addFood(FoodItem food) {
+    public synchronized void addFood(FoodItem food) {
         foods.add(food);
     }
 

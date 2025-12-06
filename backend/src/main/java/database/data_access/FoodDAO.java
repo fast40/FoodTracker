@@ -152,7 +152,7 @@ public class FoodDAO {
             for (Nutrient nutrient : nutrients) {
                 stmt.setInt(1, foodId);
                 stmt.setInt(2, nutrient.getNutrientId());
-                stmt.setFloat(3, nutrient.getAmount());
+                stmt.setDouble(3, nutrient.getAmount());
                 stmt.addBatch();
             }
 

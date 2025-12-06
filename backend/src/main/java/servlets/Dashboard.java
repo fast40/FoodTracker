@@ -8,6 +8,7 @@ import database.data_transfer.LogEntry;
 import database.data_transfer.User;
 import database.helpers.RequestJsonParser;
 import database.wrappers.FoodItem;
+import database.wrappers.Nutrient;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.gson.JsonObject;
 
@@ -38,6 +40,55 @@ public class Dashboard extends HttpServlet {
     private FoodDAO foodDAO = new FoodDAO();
 
     private record RequestData (String startDate, String endDate, String timezone) {}
+
+    private void scaleNutrients(FoodItem food, float factor) {
+        if (food == null || food.getNutrients() == null) {
+            return;
+        }
+
+        for (Nutrient nutrient : food.getNutrients()) {
+            if (nutrient == null) continue;
+            nutrient.setAmount(nutrient.getAmount() * factor);
+        }
+    }
+
+    private Map<LocalDate, DailyFoodLog> buildDailyFoodLogParallelized(
+        List<LogEntry> history,
+        ZoneId userZone,
+        FoodDAO foodDAO
+    ) throws InterruptedException {
+
+        Map<LocalDate, DailyFoodLog> dailyFoodLog = new ConcurrentHashMap<>();
+        List<Thread> threads = new ArrayList<>();
+
+        for (LogEntry log : history) {
+            Thread t = new Thread(() -> {
+                FoodItem item = foodDAO.getFoodById(log.foodId());
+
+                scaleNutrients(item, log.quantity());
+
+                LocalDate localDate = log.date()
+                        .toInstant()
+                        .atZone(userZone)
+                        .toLocalDate();
+
+                DailyFoodLog dayLog = dailyFoodLog.computeIfAbsent(
+                        localDate,
+                        date -> new DailyFoodLog(date.toString())
+                );
+                dayLog.addFood(item); // addFood synchronized
+            });
+
+            t.start();
+            threads.add(t);
+        }
+
+        for (Thread t : threads) {
+            t.join();
+        }
+
+        return dailyFoodLog;
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -96,14 +147,16 @@ public class Dashboard extends HttpServlet {
         try {
             //get a log of all the foodIDs within the range
             history = historyDAO.GetHistory(user.id(), mysql_start, mysql_end, entryLimit);
-            Map<LocalDate, DailyFoodLog> dailyFoodLog = new LinkedHashMap<>();
+            // Map<LocalDate, DailyFoodLog> dailyFoodLog = new LinkedHashMap<>();
+
+            Map<LocalDate, DailyFoodLog> dailyFoodLog = buildDailyFoodLogParallelized(history, userZone, foodDAO);
 
             //for each foodID, get the associated FoodItem
-            for (LogEntry log : history)  {
-                FoodItem item = foodDAO.getFoodById(log.foodId());
-                LocalDate localDate = log.date().toInstant().atZone(userZone).toLocalDate();
-                dailyFoodLog.computeIfAbsent(localDate, date -> new DailyFoodLog(date.toString())).addFood(item);
-            }
+            // for (LogEntry log : history)  {
+            //     FoodItem item = foodDAO.getFoodById(log.foodId());
+            //     LocalDate localDate = log.date().toInstant().atZone(userZone).toLocalDate();
+            //     dailyFoodLog.computeIfAbsent(localDate, date -> new DailyFoodLog(date.toString())).addFood(item);
+            // }
 
             List<DailyFoodLog> dailyHistory = new ArrayList<>(dailyFoodLog.values());
             String json = gson.toJson(dailyHistory);
@@ -114,6 +167,9 @@ public class Dashboard extends HttpServlet {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.write("{\"error\": \"Database error\"}");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            out.write("{\"error\": \"Database error (thread interrupted)\"}");
         }
     }
 }
