@@ -48,69 +48,93 @@ export default function Register() {
   }, []);
 
   return (
-    <DefaultLayout>
-      <img
-        src={ImageL}
-        className="absolute left-[-200px] top-[64px] h-[calc(100vh-64px)] w-auto z-0 object-cover"
-      />
-      <img
-        src={ImageR}
-        className="absolute right-[-200px] top-[64px] h-[calc(100vh-64px)] w-auto z-0 object-cover"
-      />
+    <DefaultLayout fullWidth>
+      <div className="flex w-full h-[calc(100vh-65px)] items-center">
+        <div className="hidden md:block w-1/4 h-full">
+          <img
+            src={ImageL}
+            className="w-full h-full object-cover"
+            alt="Register Left"
+          />
+        </div>
 
-      <div className="max-w-3xl mx-auto mt-3">
-        <h1 className="text-2xl font-semibold mb-4">Register</h1>
-        <p className="text-1xl text-red-400 mb-3">
-          <i>{message}</i>
-        </p>
+        <div className="w-full md:w-1/2 flex flex-col justify-center px-8">
+          <div className="max-w-md mx-auto w-full">
+            <h1 className="text-2xl font-semibold mb-4">Register</h1>
+            <p className="text-1xl text-red-400 mb-3">
+              <i>{message}</i>
+            </p>
 
-        <Form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <Input
-            label="Email"
-            labelPlacement="outside"
-            placeholder="Email"
-            onChange={(e) => {
-              setFormData((prev) => ({ ...prev, email: e.target.value }));
-            }}
-            type="email"
-            isRequired
+            <Form
+              onSubmit={handleSubmit}
+              className="flex flex-col gap-3 w-full"
+            >
+              <Input
+                label="Email"
+                labelPlacement="outside"
+                placeholder="Email"
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, email: e.target.value }));
+                }}
+                type="email"
+                isRequired
+                className="w-full"
+              />
+              <Input
+                label="Username"
+                labelPlacement="outside"
+                placeholder="Username"
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    username: e.target.value,
+                  }));
+                }}
+                isRequired
+                className="w-full"
+              />
+              <Input
+                label="Password"
+                labelPlacement="outside"
+                placeholder="Password"
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    password: e.target.value,
+                  }));
+                }}
+                type="password"
+                isRequired
+                className="w-full"
+              />
+              <Input
+                label="Confirm Password"
+                labelPlacement="outside"
+                placeholder="Confirm Password"
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    confPassword: e.target.value,
+                  }));
+                }}
+                type="password"
+                isRequired
+                className="w-full"
+              />
+              <Button type="submit" variant="bordered" className="mt-2 w-full">
+                Register
+              </Button>
+            </Form>
+          </div>
+        </div>
+
+        <div className="hidden md:block w-1/4 h-full">
+          <img
+            src={ImageR}
+            className="w-full h-full object-cover"
+            alt="Register Right"
           />
-          <Input
-            label="Username"
-            labelPlacement="outside"
-            placeholder="Username"
-            onChange={(e) => {
-              setFormData((prev) => ({ ...prev, username: e.target.value }));
-            }}
-            isRequired
-          />
-          <Input
-            label="Password"
-            labelPlacement="outside"
-            placeholder="Password"
-            onChange={(e) => {
-              setFormData((prev) => ({ ...prev, password: e.target.value }));
-            }}
-            type="password"
-            isRequired
-          />
-          <Input
-            label="Confirm Password"
-            labelPlacement="outside"
-            placeholder="Confirm Password"
-            onChange={(e) => {
-              setFormData((prev) => ({
-                ...prev,
-                confPassword: e.target.value,
-              }));
-            }}
-            type="password"
-            isRequired
-          />
-          <Button type="submit" variant="bordered" className="mt-2">
-            Register
-          </Button>
-        </Form>
+        </div>
       </div>
     </DefaultLayout>
   );

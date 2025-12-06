@@ -37,48 +37,70 @@ export default function Login() {
   }, []);
 
   return (
-    <DefaultLayout>
-      <img
-        src={ImageL}
-        className="absolute left-[-200px] top-[64px] h-[calc(100vh-64px)] w-auto z-0 object-cover"
-      />
-      <img
-        src={ImageR}
-        className="absolute right-[-200px] top-[64px] h-[calc(100vh-64px)] w-auto z-0 object-cover"
-      />
-
-      <div className="max-w-3xl mx-auto mt-3">
-        <h1 className="text-2xl font-semibold mb-4">Login</h1>
-        <p className="text-1xl text-red-400 mb-3">
-          <i>{message}</i>
-        </p>
-
-        <Form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <Input
-            label="Username"
-            labelPlacement="outside"
-            placeholder="Username"
-            value={formData.username}
-            onChange={(e) => {
-              setFormData((prev) => ({ ...prev, username: e.target.value }));
-            }}
-            isRequired
+    <DefaultLayout fullWidth>
+      <div className="flex w-full h-[calc(100vh-65px)] items-center">
+        <div className="hidden md:block w-1/4 h-full">
+          <img
+            src={ImageL}
+            className="w-full h-full object-cover"
+            alt="Login Left"
           />
-          <Input
-            label="Password"
-            labelPlacement="outside"
-            placeholder="Password"
-            value={formData.password}
-            onChange={(e) => {
-              setFormData((prev) => ({ ...prev, password: e.target.value }));
-            }}
-            type="password"
-            isRequired
+        </div>
+
+        <div className="w-full md:w-1/2 flex flex-col justify-center px-8">
+          <div className="max-w-md mx-auto w-full">
+            <h1 className="text-2xl font-semibold mb-4">Login</h1>
+            <p className="text-1xl text-red-400 mb-3">
+              <i>{message}</i>
+            </p>
+
+            <Form
+              onSubmit={handleSubmit}
+              className="flex flex-col gap-3 w-full"
+            >
+              <Input
+                label="Username"
+                labelPlacement="outside"
+                placeholder="Username"
+                value={formData.username}
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    username: e.target.value,
+                  }));
+                }}
+                isRequired
+                className="w-full"
+              />
+              <Input
+                label="Password"
+                labelPlacement="outside"
+                placeholder="Password"
+                value={formData.password}
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    password: e.target.value,
+                  }));
+                }}
+                type="password"
+                isRequired
+                className="w-full"
+              />
+              <Button type="submit" variant="bordered" className="mt-2 w-full">
+                Login
+              </Button>
+            </Form>
+          </div>
+        </div>
+
+        <div className="hidden md:block w-1/4 h-full">
+          <img
+            src={ImageR}
+            className="w-full h-full object-cover"
+            alt="Login Right"
           />
-          <Button type="submit" variant="bordered" className="mt-2">
-            Login
-          </Button>
-        </Form>
+        </div>
       </div>
     </DefaultLayout>
   );

@@ -24,7 +24,6 @@ import database.data_transfer.LogEntry;
 import database.data_transfer.User;
 import database.helpers.RequestJsonParser;
 import database.wrappers.FoodItem;
-import database.wrappers.Nutrient;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

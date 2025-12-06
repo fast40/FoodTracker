@@ -1,11 +1,15 @@
 package database.data_access;
 
-import database.data_transfer.LogEntry;
-import database.helpers.Enumerations;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
+import database.data_transfer.LogEntry;
+import database.helpers.Enumerations;
 
 
 
