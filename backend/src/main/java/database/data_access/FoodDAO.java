@@ -185,23 +185,20 @@ public class FoodDAO {
     }
 
     private List<Nutrient> GetNutrients(Integer food_id) {
-        String query = "SELECT fnv.amount, nd.name, nd.unit_name, nd.nutrient_id, nd.nutrient_number " +
-                       "FROM food_nutrient_values fnv " +
-                       "JOIN nutrient_definitions nd ON fnv.nutrient_id = nd.nutrient_id " +
-                       "WHERE fnv.food_id = ?";
+        String query = "SELECT nutrient_id, amount FROM food_nutrient_values WHERE food_id = ?";
         List<Nutrient> nutrients = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, food_id);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Integer nutrientID = rs.getInt("nutrient_id");
-                String name = rs.getString("name");
-                String nutrientNumber = rs.getString("nutrient_number");
                 Float amount = rs.getFloat("amount");
-                String unitName = rs.getString("unit_name");
 
-                Nutrient nutrient = new Nutrient(nutrientID, name, nutrientNumber, amount, unitName);
-                nutrients.add(nutrient);
+                database.helpers.Enumerations.NutrientType type = database.helpers.Enumerations.NutrientType.fromId(nutrientID);
+                if (type != null) {
+                    Nutrient nutrient = new Nutrient(type, amount);
+                    nutrients.add(nutrient);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

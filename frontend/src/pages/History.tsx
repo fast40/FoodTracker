@@ -156,7 +156,7 @@ function transformBackendDays(rawDays: DailyFoodLog[]) {
       //return the transformed entry formatted exactly how the UI expects it
       return {
         //unique identifier for the food. Support both foodId and id
-        id: entry.food.foodId,
+        id: entry.logId || entry.food.foodId,
         name: entry.food.description,
         nutrients: nutrientsObj,
         consumed: {

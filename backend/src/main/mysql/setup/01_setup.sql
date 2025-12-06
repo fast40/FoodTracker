@@ -47,14 +47,6 @@ CREATE TABLE food_logs (
     FOREIGN KEY (food_id) REFERENCES food_items(food_id) ON DELETE CASCADE
 );
 
-CREATE TABLE nutrient_definitions (
-    nutrient_id INT PRIMARY KEY, -- USDA Nutrient ID
-    nutrient_number VARCHAR(10), -- USDA Nutrient Number (e.g. "203")
-    name VARCHAR(255) NOT NULL,
-    unit_name VARCHAR(20) NOT NULL, -- g, mg, kcal, etc.
-    is_macronutrient BOOLEAN DEFAULT FALSE
-);
-
 -- Custom Foods (User Generated)
 CREATE TABLE food_nutrient_values (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -63,7 +55,6 @@ CREATE TABLE food_nutrient_values (
     amount FLOAT NOT NULL,
 
     FOREIGN KEY (food_id) REFERENCES food_items(food_id) ON DELETE CASCADE,
-    -- FOREIGN KEY (nutrient_id) REFERENCES nutrient_definitions(nutrient_id) ON DELETE CASCADE,
     UNIQUE(food_id, nutrient_id)
 );
 
