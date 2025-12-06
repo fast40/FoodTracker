@@ -3,9 +3,26 @@ import DefaultLayout from "@/layouts/default";
 import { PhotoScanView } from "@/components/photoScanView";
 
 function Scan() {
-  const handleCode = (upc) => {
+  const handleCode = async (upc) => {
     console.log("Scanned UPC:", upc);
-    // call backend, look up food item, etc.
+    let gtin = upc;
+    try {
+      const params = new URLSearchParams({
+        gtin
+      });
+      const response = await fetch(`http://localhost:8080/food-tracker/api/food-lookup?${params.toString()}`,{
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+      if (!response.ok)
+        throw new Error("Request failed");
+
+      const json = await response.json();
+      console.log(json);
+
+    } catch (err) {
+      console.log("ERROR fetching from /api/food-lookup: " + err.message);
+    }
   };
 
   return (
