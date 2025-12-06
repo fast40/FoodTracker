@@ -20,8 +20,6 @@ export default function Dashboard() {
 
   return (
     <DefaultLayout>
-      {/*<h1 className="text-2xl font-semibold">Dashboard</h1>*/}
-
       <Button
         onClick={() => setView("day")}
         color = {view === "day" ? "primary" : "default"}
@@ -38,18 +36,9 @@ export default function Dashboard() {
       >
         Week
       </Button>
-      {/*<Button
-        onClick={() => setView("month")}
-        color = {view === "month" ? "primary" : "default"}
-        style = {{ color: view === "month" ? "white" : "gray"}}
-        className="rounded-l-none rounded-r-lg"
-      >
-        Month
-      </Button>*/}
 
       {view === "day" && <DayGraph date={date} setDate={setDate} />}
       {view === "week" && <RangeGraph date={date} setDate={setDate} />}
-      {/*{view === "month" && <RangeGraph />}*/}
     </DefaultLayout>
   );
 }

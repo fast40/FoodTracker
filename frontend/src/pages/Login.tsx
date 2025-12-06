@@ -37,7 +37,7 @@ export default function Login() {
           />
         </div>
 
-        <div className="w-full md:w-1/2 flex flex-col justify-center px-8">
+        <div className="w-full md:w-1/2 mt-[-120px] flex flex-col justify-center px-8">
           <div className="max-w-md mx-auto w-full">
             <LoginForm />
           </div>

@@ -109,7 +109,7 @@ export default function Settings() {
                 Preferences saved
               </span>
             )}
-            <Button color="primary" onPress={handleSave}>
+            <Button color="primary" style={{color: "white"}} onPress={handleSave}>
               Save Preferences
             </Button>
           </CardFooter>

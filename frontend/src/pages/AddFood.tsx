@@ -213,7 +213,7 @@ export default function AddFood() {
       <section className="max-w-2xl mx-auto my-8">
         {/* page title and scan button */}
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-semibold">Add food</h1>
+          <h1 className="text-2xl font-semibold">Add Food</h1>
           <Button
             size="sm"
             variant="flat"
@@ -232,11 +232,11 @@ export default function AddFood() {
 
         {/* error message */}
         {error && (
-          <p className="text-danger mb-4 text-sm">error saving food: {error}</p>
+          <p className="text-danger mb-8 mt-[-10px] text-sm">Error Saving Food! {error}</p>
         )}
 
         {/* main form */}
-        <Form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
+        <Form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full mt-5">
           {/* food name input */}
           <Input
             label="Food Name"
@@ -248,31 +248,37 @@ export default function AddFood() {
           />
 
           {/* servings input */}
-          <Input
-            label="Servings"
-            labelPlacement="outside"
-            type="number"
-            min="0"
-            step="any"
-            value={servings}
-            onChange={(e) => setServings(e.target.value)}
-          />
+          <div style={{width: "100%"}}>
+            <span className="text-sm font-medium">
+              Servings
+            </span>
+            <Input
+              type="number"
+              min="0"
+              step="any"
+              value={servings}
+              onChange={(e) => setServings(e.target.value)}
+            />
+          </div>
 
           {/* nutrient inputs laid out in a responsive grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full">
             {visibleFields.map((field) => (
-              <Input
-                key={field.dataKey}
-                label={`${field.label} (${field.unit})`}
-                labelPlacement="outside"
-                type="number"
-                min="0"
-                step="any"
-                value={nutrients[field.dataKey]}
-                onChange={(e) =>
-                  handleNutrientChange(field.dataKey, e.target.value)
-                }
-              />
+              <div>
+                <span className="text-sm font-medium">
+                  {field.label} ({field.unit})
+                </span>
+                <Input
+                  key={field.dataKey}
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={nutrients[field.dataKey]}
+                  onChange={(e) =>
+                    handleNutrientChange(field.dataKey, e.target.value)
+                  }
+                />
+              </div>
             ))}
           </div>
 
@@ -284,7 +290,7 @@ export default function AddFood() {
               onPress={() => navigate(user ? "/dashboard" : "/")}
               disabled={saving}
             >
-              cancel
+              Cancel
             </Button>
 
             {/* submit triggers handleSubmit() above */}
@@ -294,7 +300,7 @@ export default function AddFood() {
               type="submit"
               isDisabled={saving}
             >
-              {saving ? "saving…" : "save food"}
+              {saving ? "saving…" : "Save Food"}
             </Button>
           </div>
         </Form>
