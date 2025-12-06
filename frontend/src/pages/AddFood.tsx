@@ -7,6 +7,7 @@
 
 // import same layout wrapper as the dashboard
 import DefaultLayout from "@/layouts/default";
+import { PhotoScanView } from "@/components/photoScanView";
 
 // react hooks for local state + navigation
 // NOTE: added useEffect so we can read settings from localstorage
@@ -14,7 +15,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 // button component from heroui
-import { Button } from "@heroui/react";
+import { Button, Input, Form } from "@heroui/react";
 
 // *** new: storage key is the same as the one used in history/daygraph/settings ***
 const STORAGE_KEY = "nutrientVisibility";
@@ -98,11 +99,64 @@ export default function AddFood() {
   // error message if something went wrong
   const [error, setError] = useState<string | null>(null);
 
+  // toggle scanner visibility
+  const [showScanner, setShowScanner] = useState(false);
+
   // *** new: on mount, read the latest settings from localstorage ***
   useEffect(() => {
     const vis = loadVisibilityFromStorage();
     setVisibility(vis);
   }, []);
+
+  // handle barcode scan
+  const handleCode = async (upc: string) => {
+    console.log("Scanned UPC:", upc);
+    try {
+      const params = new URLSearchParams({ gtin: upc });
+      const response = await fetch(
+        `${API_BASE}/api/food-lookup?${params.toString()}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      if (!response.ok) throw new Error("Request failed");
+
+      const data = await response.json();
+      console.log("Food data:", data);
+
+      // Populate form
+      setName(data.description || "");
+
+      // Map nutrients
+      const newNutrients = { ...nutrients };
+
+      const mapping: Record<string, string> = {
+        Energy: "energy_kcal",
+        Protein: "protein_g",
+        "Carbohydrate, by difference": "carbs_g",
+        "Total lipid (fat)": "fat_g",
+        "Fiber, total dietary": "fiber_g",
+        "Sodium, Na": "sodium_mg",
+        "Sugars, total": "sugars_g",
+      };
+
+      if (data.nutrients) {
+        data.nutrients.forEach((n: any) => {
+          const key = mapping[n.name];
+          if (key) {
+            newNutrients[key] = String(n.amount);
+          }
+        });
+      }
+
+      setNutrients(newNutrients);
+      setShowScanner(false); // Close scanner on success
+    } catch (err: any) {
+      console.log("ERROR fetching from /api/food-lookup: " + err.message);
+      setError("Failed to fetch food data: " + err.message);
+    }
+  };
 
   // helper: update one nutrient field in state
   function handleNutrientChange(key: string, value: string) {
@@ -173,136 +227,74 @@ export default function AddFood() {
   // jsx
   return (
     <DefaultLayout>
-      <section style={{ maxWidth: 640, margin: "2rem auto" }}>
-        {/* page title */}
-        <h1
-          style={{
-            fontSize: "1.75rem",
-            fontWeight: 600,
-            marginBottom: "1rem",
-          }}
-        >
-          Add food
-        </h1>
+      <section className="max-w-2xl mx-auto my-8">
+        {/* page title and scan button */}
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-semibold">Add food</h1>
+          <Button
+            size="sm"
+            variant="flat"
+            onPress={() => setShowScanner(!showScanner)}
+          >
+            {showScanner ? "Close Scanner" : "Scan Barcode"}
+          </Button>
+        </div>
+
+        {/* scanner section */}
+        {showScanner && (
+          <div className="mb-6 p-4 border border-default-200 rounded-lg bg-content1">
+            <PhotoScanView onCode={handleCode} />
+          </div>
+        )}
 
         {/* error message */}
         {error && (
-          <p
-            style={{
-              color: "red",
-              marginBottom: "1rem",
-              fontSize: "0.9rem",
-            }}
-          >
-            error saving food: {error}
-          </p>
+          <p className="text-danger mb-4 text-sm">error saving food: {error}</p>
         )}
 
         {/* main form */}
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "1rem",
-          }}
-        >
+        <Form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
           {/* food name input */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.25rem",
-            }}
-          >
-            <label style={{ fontWeight: 500 }}>food name</label>
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., chicken salad"
-              style={{
-                padding: "0.5rem 0.75rem",
-                borderRadius: "0.5rem",
-                border: "1px solid #d1d5db",
-                fontSize: "0.95rem",
-              }}
-            />
-          </div>
+          <Input
+            label="Food Name"
+            labelPlacement="outside"
+            placeholder="e.g., chicken salad"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            isRequired
+          />
 
           {/* servings input */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.25rem",
-            }}
-          >
-            <label style={{ fontWeight: 500 }}>servings</label>
-            <input
-              type="number"
-              min="0"
-              step="0.1"
-              value={servings}
-              onChange={(e) => setServings(e.target.value)}
-              style={{
-                padding: "0.5rem 0.75rem",
-                borderRadius: "0.5rem",
-                border: "1px solid #d1d5db",
-                fontSize: "0.95rem",
-              }}
-            />
-          </div>
+          <Input
+            label="Servings"
+            labelPlacement="outside"
+            type="number"
+            min="0"
+            step="any"
+            value={servings}
+            onChange={(e) => setServings(e.target.value)}
+          />
 
           {/* nutrient inputs laid out in a responsive grid */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-              gap: "0.75rem",
-            }}
-          >
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full">
             {visibleFields.map((field) => (
-              <div
+              <Input
                 key={field.key}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.25rem",
-                }}
-              >
-                <label style={{ fontSize: "0.9rem" }}>
-                  {field.label} ({field.unit})
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.1"
-                  value={nutrients[field.key]}
-                  onChange={(e) =>
-                    handleNutrientChange(field.key, e.target.value)
-                  }
-                  style={{
-                    padding: "0.45rem 0.6rem",
-                    borderRadius: "0.5rem",
-                    border: "1px solid #d1d5db",
-                    fontSize: "0.9rem",
-                  }}
-                />
-              </div>
+                label={`${field.label} (${field.unit})`}
+                labelPlacement="outside"
+                type="number"
+                min="0"
+                step="any"
+                value={nutrients[field.key]}
+                onChange={(e) =>
+                  handleNutrientChange(field.key, e.target.value)
+                }
+              />
             ))}
           </div>
 
           {/* buttons row: cancel + save */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "0.75rem",
-              marginTop: "1rem",
-            }}
-          >
+          <div className="flex justify-end gap-3 mt-4">
             {/* cancel just goes back to the dashboard without saving */}
             <Button
               variant="bordered"
@@ -315,14 +307,14 @@ export default function AddFood() {
             {/* submit triggers handleSubmit() above */}
             <Button
               color="primary"
-              style={{ color: "white" }}
+              className="text-white"
               type="submit"
               isDisabled={saving}
             >
               {saving ? "saving…" : "save food"}
             </Button>
           </div>
-        </form>
+        </Form>
       </section>
     </DefaultLayout>
   );
