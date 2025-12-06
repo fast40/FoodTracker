@@ -55,8 +55,25 @@ First explain your conceptual approach, and then provide minimal code snippets n
 ~~~~~~~~~~~~~
 Iteration sample:
 
-// TODO: add more prompt samples
+1) Prompt:
+"The default <Legend /> for a Recharts BarChart sorts the items alphabetically. Is there an easy way to remove this sorting so that the legend displays in the same order as the stacked bars?"
 
+[AI responds]
+
+"It's still displaying in alphabetical order. Explain the process for how Recharts decides how to order the bars in a stacked bar chart, and the exact process we use to order items in this custom Legend. Why do they not match?"
+
+[AI responds]
+
+2) Issue:
+After adding the custom legend code the legend still displayed in alphabetical order, while the bars did not.
+
+3) Fix:
+Instead of trying to reorder the legend, I realized that an easier fix would be to reorder the bars themselves by sorting the food data array.
+
+4) Explanation:
+This process demonstrates how using AI prompts is useful not only for generating code but for understanding it. Instead of brute-forcing the initial idea of creating
+a manually sorted legend, the second AI prompt helped me understand that there was a simpler and more user-friendly approach. By keeping the alphabetical order and 
+instead displaying the bars in that order, the dashboard is easier to read (the same items are always on the same side of the legend, for example), and the code is simpler to understand.
 
 
 TEAMMATE 4:
