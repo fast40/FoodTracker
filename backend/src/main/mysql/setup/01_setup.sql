@@ -19,33 +19,6 @@ CREATE TABLE user_roles (
     role VARCHAR(64) NOT NULL DEFAULT 'USER'
 );
 
-CREATE TABLE simple_food_items (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(64),
-    energy_kcal INT,
-    protein_g INT,
-    carbs_g INT,
-    fat_g INT,
-    fiber_g INT,
-    sodium_mg INT,
-    sugars_g INT,
-    user_id INT, -- the user who created this food item, if any (so can be NULL)
-
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
-);
-
-CREATE TABLE simple_food_logs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    food_id INT NOT NULL,
-    quantity FLOAT NOT NULL DEFAULT 1.0, -- Number of servings
-    log_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    meal_type VARCHAR(20), -- Breakfast, Lunch, Dinner, Snack
-
-    FOREIGN KEY (food_id) REFERENCES simple_food_items(id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
-);
-
 CREATE TABLE food_items (
     food_id INT AUTO_INCREMENT PRIMARY KEY,
     fdc_id INT UNIQUE, -- USDA ID. UNIQUE ensures we only store one copy of each USDA food.

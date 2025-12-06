@@ -26,6 +26,7 @@ import database.data_access.FoodDAO;
 import database.data_access.HistoryDAO;
 import database.data_access.UserDAO;
 import database.data_transfer.User;
+import database.helpers.Enumerations;
 import database.helpers.RequestJsonParser;
 import database.helpers.Enumerations.NutrientType;
 import database.wrappers.FoodItem;
@@ -148,7 +149,7 @@ public class LogItem extends HttpServlet {
 
                 int foodId = foodDAO.insertFoodItem(foodItem);
 
-                historyDAO.AddToHistory(user.id(), foodId, Timestamp.from(Instant.now()));
+                historyDAO.AddToHistory(user.id(), foodId, foodEntry.servings(), Enumerations.MealType.BREAKFAST, Timestamp.from(Instant.now()));
 
                 response.setContentType("application/json");
                 response.setStatus(HttpServletResponse.SC_OK);

@@ -18,13 +18,13 @@ public class HistoryDAO {
     public boolean AddToHistory(int user_id, int food_id, Timestamp timestamp) {
         return AddToHistory(user_id, food_id, 1, Enumerations.MealType.BREAKFAST, timestamp);
     }
-    public boolean AddToHistory(int user_id, int food_id, int quantity, Enumerations.MealType meal_type, Timestamp timestamp) {
+    public boolean AddToHistory(int user_id, int food_id, float quantity, Enumerations.MealType meal_type, Timestamp timestamp) {
         String query = "INSERT INTO food_logs (user_id, food_id, quantity, meal_type, log_date)" + "VALUES(?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, user_id);
             stmt.setInt(2, food_id);
-            stmt.setInt(3, quantity);
+            stmt.setFloat(3, quantity);
             stmt.setString(4, meal_type.GetName());
             stmt.setTimestamp(5, timestamp);
             return stmt.executeUpdate() > 0;
