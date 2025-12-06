@@ -35,7 +35,13 @@ function addDays(start, n) {
   return d.toISOString();
 }
 
-export function RangeGraph({ date, setDate }) {
+export function RangeGraph({
+  date,
+  setDate,
+}: {
+  date: string;
+  setDate: (d: string) => void;
+}) {
   const { startDate, endDate, weekLocalDates } = useMemo(() => {
     const d = new Date(date);
     const day = d.getDay(); // 0 = Sun, 1 = Mon, ...
@@ -91,8 +97,8 @@ export function RangeGraph({ date, setDate }) {
       }, {});
       for (const entry of day.foods) {
         for (const n of nutrients) {
-          const factor = entry?.consumed?.servings ?? 1;
-          const nutrient = entry?.nutrients?.find(
+          const factor = entry.quantity ?? 1;
+          const nutrient = entry.food.nutrients?.find(
             (nut) => nut.nutrientId === n.id
           );
           totals[n.id] += (nutrient?.amount || 0) * factor;

@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { useCallback, useRef, useState } from "react";
-import { Button } from "@heroui/button";
+import { Button } from "@heroui/react";
 import { usePhotoScan } from "@/hooks/usePhotoScan";
 
 export function PhotoScanView({ onCode }) {

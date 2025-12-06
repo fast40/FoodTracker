@@ -4,12 +4,11 @@ import { useNavigate } from "react-router-dom";
 
 import Food from "@/images/Homepage Image.jpg";
 
-import { button as buttonStyles } from "@heroui/theme";
+import { button as buttonStyles } from "@heroui/react";
 import { Button } from "@heroui/react";
 import { useAuth } from "@/context/AuthContext";
 
-export default function Home()
-{
+export default function Home() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -34,11 +33,10 @@ export default function Home()
           textAlign: "center",
         }}
       >
-        <h1 style={{ fontSize: "3rem", fontWeight: "600"}}>
-          FoodTracker
-        </h1>
-        <p style={{fontSize: "1.4rem", marginTop: "5px"}}>
-          Track daily nutrients with barcode scans or quick manual entry, and visualize your trends over time.
+        <h1 style={{ fontSize: "3rem", fontWeight: "600" }}>FoodTracker</h1>
+        <p style={{ fontSize: "1.4rem", marginTop: "5px" }}>
+          Track daily nutrients with barcode scans or quick manual entry, and
+          visualize your trends over time.
         </p>
         <Button
           onPress={() => navigate(user == null ? "/register" : "/add")}
@@ -48,7 +46,7 @@ export default function Home()
             paddingBottom: "23px",
             color: "white",
             fontSize: "1.3rem",
-            filter: "drop-shadow(0px 4px 4px rgba(202, 153, 255, 0.4))"
+            filter: "drop-shadow(0px 4px 4px rgba(202, 153, 255, 0.4))",
           }}
           className={buttonStyles({
             color: "primary",
@@ -58,14 +56,16 @@ export default function Home()
         </Button>
       </div>
 
-      <img src={Food} 
-      style={{
-        marginTop: "6rem",
-        width: "100vw",
-        maxWidth: "none",
-        marginLeft: "calc(50% - 50vw)",
-        objectFit: "cover",
-      }} />
+      <img
+        src={Food}
+        style={{
+          marginTop: "6rem",
+          width: "100vw",
+          maxWidth: "none",
+          marginLeft: "calc(50% - 50vw)",
+          objectFit: "cover",
+        }}
+      />
     </DefaultLayout>
   );
 }

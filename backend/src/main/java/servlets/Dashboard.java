@@ -1,9 +1,25 @@
 package servlets;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.security.Principal;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.google.gson.Gson;
+
 import database.data_access.FoodDAO;
 import database.data_access.HistoryDAO;
 import database.data_access.UserDAO;
 import database.data_transfer.DailyFoodLog;
+import database.data_transfer.FoodLogEntry;
 import database.data_transfer.LogEntry;
 import database.data_transfer.User;
 import database.helpers.RequestJsonParser;
@@ -13,18 +29,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.google.gson.Gson;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.security.Principal;
-import java.sql.SQLException;
-import java.time.Instant;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @WebServlet("/api/dashboard")
 public class Dashboard extends HttpServlet {
@@ -38,55 +42,6 @@ public class Dashboard extends HttpServlet {
     private FoodDAO foodDAO = new FoodDAO();
 
     private record RequestData (String startDate, String endDate, String timezone) {}
-
-    private void scaleNutrients(FoodItem food, float factor) {
-        if (food == null || food.getNutrients() == null) {
-            return;
-        }
-
-        for (Nutrient nutrient : food.getNutrients()) {
-            if (nutrient == null) continue;
-            nutrient.setAmount(nutrient.getAmount() * factor);
-        }
-    }
-
-    private Map<LocalDate, DailyFoodLog> buildDailyFoodLogParallelized(
-        List<LogEntry> history,
-        ZoneId userZone,
-        FoodDAO foodDAO
-    ) throws InterruptedException {
-
-        Map<LocalDate, DailyFoodLog> dailyFoodLog = new ConcurrentHashMap<>();
-        List<Thread> threads = new ArrayList<>();
-
-        for (LogEntry log : history) {
-            Thread t = new Thread(() -> {
-                FoodItem item = foodDAO.getFoodById(log.foodId());
-
-                scaleNutrients(item, log.quantity());
-
-                LocalDate localDate = log.date()
-                        .toInstant()
-                        .atZone(userZone)
-                        .toLocalDate();
-
-                DailyFoodLog dayLog = dailyFoodLog.computeIfAbsent(
-                        localDate,
-                        date -> new DailyFoodLog(date.toString())
-                );
-                dayLog.addFood(item); // addFood synchronized
-            });
-
-            t.start();
-            threads.add(t);
-        }
-
-        for (Thread t : threads) {
-            t.join();
-        }
-
-        return dailyFoodLog;
-    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -141,7 +96,23 @@ public class Dashboard extends HttpServlet {
         try {
             //get a log of all the foodIDs within the range
             history = historyDAO.GetHistory(user.id(), mysql_start, mysql_end, entryLimit);
-            Map<LocalDate, DailyFoodLog> dailyFoodLog = buildDailyFoodLogParallelized(history, userZone, foodDAO);
+            Map<LocalDate, DailyFoodLog> dailyFoodLog = new LinkedHashMap<>();
+
+            //for each foodID, get the associated FoodItem
+            for (LogEntry log : history)  {
+                FoodItem item = foodDAO.getFoodById(log.foodId());
+                LocalDate localDate = log.date().toInstant().atZone(userZone).toLocalDate();
+                
+                FoodLogEntry entry = new FoodLogEntry(
+                    log.logId(),
+                    item,
+                    log.quantity(),
+                    log.date().toInstant().toString(),
+                    log.mealType()
+                );
+
+                dailyFoodLog.computeIfAbsent(localDate, date -> new DailyFoodLog(date.toString())).addFood(entry);
+            }
 
             List<DailyFoodLog> dailyHistory = new ArrayList<>(dailyFoodLog.values());
             String json = gson.toJson(dailyHistory);
@@ -152,9 +123,6 @@ public class Dashboard extends HttpServlet {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.write("{\"error\": \"Database error\"}");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            out.write("{\"error\": \"Database error (thread interrupted)\"}");
         }
     }
 }

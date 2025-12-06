@@ -19,10 +19,17 @@ export interface FoodItem {
   nutrients: Nutrient[];
 }
 
+// Current API Response Structure
+export interface DailyFoodLog {
+  date: string;
+  foods: FoodItem[];
+}
+
+// Future/Ideal Structure (Not yet returned by API)
 export interface FoodLogEntry {
   logId: number;
   food: FoodItem;
   quantity: number; // Number of servings
   logDate: string; // ISO timestamp
-  mealType: "Breakfast" | "Lunch" | "Dinner" | "Snack";
+  mealType: "breakfast" | "lunch" | "dinner" | "snack";
 }

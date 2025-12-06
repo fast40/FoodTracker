@@ -13,8 +13,8 @@ import DefaultLayout from "@/layouts/default";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-// button component from heroui 
-import { Button } from "@heroui/button";
+// button component from heroui
+import { Button } from "@heroui/react";
 
 // units map so user can label the inputs with (g, mg, kcal…)
 import { UNITS } from "@/data";
@@ -172,7 +172,7 @@ export default function AddFood() {
     }
   }
 
-  // jsx 
+  // jsx
   return (
     <DefaultLayout>
       <section style={{ maxWidth: 640, margin: "2rem auto" }}>

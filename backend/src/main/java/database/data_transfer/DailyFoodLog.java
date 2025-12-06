@@ -7,17 +7,17 @@ import java.util.List;
 
 public class DailyFoodLog {
     private String date;
-    private List<FoodItem> foods;
+    private List<FoodLogEntry> foods;
 
     public DailyFoodLog(String date) {
         this.date = date;
-        this.foods = new ArrayList<FoodItem>();
+        this.foods = new ArrayList<FoodLogEntry>();
     }
 
-    public synchronized void addFood(FoodItem food) {
+    public void addFood(FoodLogEntry food) {
         foods.add(food);
     }
 
     public String getDate() { return date; }
-    public List<FoodItem> getFoods() { return foods; }
+    public List<FoodLogEntry> getFoods() { return foods; }
 }

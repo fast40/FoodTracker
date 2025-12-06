@@ -35,7 +35,13 @@ function addDays(start, n) {
   return d.toISOString();
 }
 
-export function DayGraph({ date, setDate }) {
+export function DayGraph({
+  date,
+  setDate,
+}: {
+  date: string;
+  setDate: (d: string) => void;
+}) {
   const startDate = useMemo(() => new Date(date).toISOString(), [date]);
   const endDate = useMemo(() => addDays(new Date(date), 1), [date]);
 
@@ -58,8 +64,8 @@ export function DayGraph({ date, setDate }) {
   }, []);
 
   const foods = (entries || []).map((e, i) => ({
-    id: e.foodId || String(i),
-    name: e.description,
+    id: e.food.foodId || String(i),
+    name: e.food.description,
   }));
 
   const foodsSorted = [...foods]
@@ -75,10 +81,12 @@ export function DayGraph({ date, setDate }) {
     (entries || []).map((e, i) => {
       const foodId = foods[i]?.id;
       if (!foodId) return;
-      const factor = e?.consumed?.servings ?? 1;
+      const factor = e.quantity ?? 1;
 
       nutrients.forEach((n) => {
-        const nutrient = e?.nutrients?.find((nut) => nut.nutrientId === n.id);
+        const nutrient = e.food.nutrients?.find(
+          (nut) => nut.nutrientId === n.id
+        );
         const abs = (nutrient?.amount || 0) * factor;
         const dv = DEFAULT_DV[n.id] || 0;
         const uncappedPct = dv ? Math.max(0, (abs / dv) * 100) : 0;

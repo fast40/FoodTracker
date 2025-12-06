@@ -6,18 +6,17 @@ import { BASE_NUTRIENTS } from "@/data";
 
 const STORAGE_KEY = "nutrientVisibility";
 
-//helper function --> add/bubtract days from a year-month-day string 
-//                --> use this to calculate the date range for backend queries 
-function addDays(start, n) 
-{
-  const d = new Date(start); 
-  d.setDate(d.getDate() + n); 
+//helper function --> add/bubtract days from a year-month-day string
+//                --> use this to calculate the date range for backend queries
+function addDays(start, n) {
+  const d = new Date(start);
+  d.setDate(d.getDate() + n);
   return d.toISOString();
 }
 
-//Nutrients: 
+//Nutrients:
 //logicalKey --> used in UI and visibility settings
-//dataKey --> the key from backend data (energy_kcal, carbs_g, and more) 
+//dataKey --> the key from backend data (energy_kcal, carbs_g, and more)
 //label --> UI label
 //unit --> units for display
 //id --> numeric nutrient ID from backend, using BASE_NUTRIENTS lookup
@@ -76,7 +75,6 @@ const NUTRIENTS = [
   },
 ];
 
-
 //Top UI tabs for range selection (either all or the last 7 days)
 const RANGE_OPTIONS = [
   { id: "all", label: "All history" },
@@ -106,15 +104,16 @@ const DAILY_VALUES = {
   sugars: 50,
 };
 
-
-//create an empty object 
+//create an empty object
 function createEmptyTotals() {
   const totals = {};
-  NUTRIENTS.forEach((n) => {totals[n.dataKey] = 0;});
+  NUTRIENTS.forEach((n) => {
+    totals[n.dataKey] = 0;
+  });
   return totals;
 }
 
-//compute the totals for a single day 
+//compute the totals for a single day
 //then loop through each entry (food item) and multiply the values by the servings
 function computeDayTotals(day) {
   //create an empty object with everything init to 0
@@ -138,8 +137,8 @@ function computeDayTotals(day) {
   return totals;
 }
 
-//this function loops through each day, it also computes that day's total and then adds them to the daily total 
-//compute the totals across many days 
+//this function loops through each day, it also computes that day's total and then adds them to the daily total
+//compute the totals across many days
 function computeTotalsForDays(days) {
   const totals = createEmptyTotals();
 
@@ -153,13 +152,12 @@ function computeTotalsForDays(days) {
   return totals;
 }
 
-
-//this is from the browser's localStorage 
-//allows the UI to remember the user's preference even after reefreshinf or closing the page 
-//if anything goes wrong 
+//this is from the browser's localStorage
+//allows the UI to remember the user's preference even after reefreshinf or closing the page
+//if anything goes wrong
 //load visibily settings this allows the UI to remember the user's preference even
 function loadVisibilityFromStorage() {
-  //if window doesn't exist 
+  //if window doesn't exist
   //we cannot access localStorage, so return defaults
   if (typeof window === "undefined") return DEFAULT_VISIBILITY;
 
@@ -255,20 +253,18 @@ function transformBackendDays(rawDays) {
   });
 }
 
-
 //main component
 export default function History() {
   //which tab is selected? ("all" or "last7")
   const [range, setRange] = useState("all");
 
-
-  //compute which start/end dates to request from backend. useMemo ensures this only recalculates when range changes 
+  //compute which start/end dates to request from backend. useMemo ensures this only recalculates when range changes
   const { startDateIso, endDateIso } = useMemo(() => {
     const today = new Date();
     const todayStr = today.toISOString().slice(0, 10);
 
     //up to tomorrow
-    const end = addDays(todayStr, 1); 
+    const end = addDays(todayStr, 1);
     const start =
       range === "last7"
         ? addDays(todayStr, -7) // last 7 days
@@ -277,18 +273,16 @@ export default function History() {
     return { startDateIso: start, endDateIso: end };
   }, [range]);
 
-  //Fetch backend SQL history 
+  //Fetch backend SQL history
   const backendRange = useRangeData(startDateIso, endDateIso);
   const backendDays = transformBackendDays(backendRange || []);
 
   //debug
   console.log("backendRange raw:", backendRange);
-  console.log("backendDays transformed:", backendDays); 
+  console.log("backendDays transformed:", backendDays);
 
   //Prefer backend if available; otherwise show placeholder data
-  const allDays =
-    backendDays.length > 0
-      ? backendDays : [];
+  const allDays = backendDays.length > 0 ? backendDays : [];
   // If backend returned empty → show empty. DO NOT use test data on History page.
   // const allDays = backendDays;
 
@@ -300,7 +294,6 @@ export default function History() {
     setVisibility(loadVisibilityFromStorage());
   }, []);
 
-
   //visibleDays = days to display based on the selected tab even through backend already returns the righ range, we explicitly slice last 7 days to match UI logic
   const visibleDays = useMemo(() => {
     if (range === "last7") {
@@ -309,8 +302,8 @@ export default function History() {
     return allDays;
   }, [range, allDays]);
 
-  //compute totals and averages across visible days 
-  //useMemo ensures recalculation only when visibleDays change 
+  //compute totals and averages across visible days
+  //useMemo ensures recalculation only when visibleDays change
   const { overviewTotals, overviewAverages } = useMemo(() => {
     const totals = computeTotalsForDays(visibleDays);
     const averages = createEmptyTotals();
@@ -329,7 +322,6 @@ export default function History() {
   return (
     <DefaultLayout>
       <div className="max-w-6xl mx-auto px-4 py-6 mt-4 space-y-8">
-        
         {/*HEADER */}
         <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
@@ -471,8 +463,7 @@ export default function History() {
                   <div className="flex flex-wrap gap-2 mb-3 text-xs">
                     {NUTRIENTS.filter(
                       (n) =>
-                        n.logicalKey !== "calories" &&
-                        visibility[n.logicalKey]
+                        n.logicalKey !== "calories" && visibility[n.logicalKey]
                     ).map((n) => {
                       const amount = totals[n.dataKey] || 0;
                       const percentDV = getDailyValuePercent(

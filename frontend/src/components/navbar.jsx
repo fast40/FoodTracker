@@ -1,4 +1,4 @@
-import { Link } from "@heroui/link";
+import { Link } from "@heroui/react";
 import {
   Navbar as HeroUINavbar,
   NavbarBrand,
@@ -7,8 +7,8 @@ import {
   NavbarMenu,
   NavbarMenuItem,
   NavbarMenuToggle,
-} from "@heroui/navbar";
-import { link as linkStyles } from "@heroui/theme";
+  link as linkStyles,
+} from "@heroui/react";
 import clsx from "clsx";
 
 import { siteConfig } from "@/site-config";
@@ -72,19 +72,19 @@ export const Navbar = () => {
               return true;
             })
             .map((item) => (
-            <NavbarItem key={item.href}>
-              <Link
-                className={clsx(
-                  linkStyles({ color: "white" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium"
-                )}
-                color="white"
-                href={item.href}
-              >
-                {item.label}
-              </Link>
-            </NavbarItem>
-          ))}
+              <NavbarItem key={item.href}>
+                <Link
+                  className={clsx(
+                    linkStyles({ color: "white" }),
+                    "data-[active=true]:text-primary data-[active=true]:font-medium"
+                  )}
+                  color="white"
+                  href={item.href}
+                >
+                  {item.label}
+                </Link>
+              </NavbarItem>
+            ))}
         </div>
       </NavbarContent>
       <NavbarMenu className="bg-[#131313]">
@@ -95,12 +95,12 @@ export const Navbar = () => {
             return true;
           })
           .map((item) => (
-          <NavbarMenuItem key={item.href} onClick={() => setMenuOpen(false)}>
-            <Link href={item.href} color="white">
-              {item.label}
-            </Link>
-          </NavbarMenuItem>
-        ))}
+            <NavbarMenuItem key={item.href} onClick={() => setMenuOpen(false)}>
+              <Link href={item.href} color="white">
+                {item.label}
+              </Link>
+            </NavbarMenuItem>
+          ))}
       </NavbarMenu>
     </HeroUINavbar>
   );
