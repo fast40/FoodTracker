@@ -3,10 +3,13 @@ package database.data_access;
 import com.mysql.cj.log.Log;
 import database.data_transfer.LogEntry;
 import database.helpers.Enumerations;
+import database.wrappers.FoodItem;     
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;    
+import java.util.stream.IntStream;    
 
 
 public class HistoryDAO {
@@ -61,4 +64,42 @@ public class HistoryDAO {
         }
         return history;
     }
+
+    /**
+     * Multithreaded demo method:
+     *  - takes a list of numbers (for example, quantities or multipliers)
+     *  - and a list of FoodItem objects of the same length
+     *  - converts each FoodItem to a numeric value
+     *  - multiplies the pair (number, foodValue) for each index
+     *
+     * The work is done in parallel using a parallel stream, which means
+     * Java will use multiple threads from the ForkJoinPool to process
+     * different indices at the same time.
+     */
+    public List<Double> multiplyNumbersAndFoodsParallel(
+            List<Double> numbers,
+            List<FoodItem> foods
+    ) {
+        if (numbers == null || foods == null) {
+            throw new IllegalArgumentException("Input lists must not be null");
+        }
+        if (numbers.size() != foods.size()) {
+            throw new IllegalArgumentException("Lists must be the same size");
+        }
+
+        // IntStream.range(...).parallel() = multithreading
+        return IntStream.range(0, numbers.size())
+                .parallel()  // <--- this is what makes it run on multiple threads
+                .mapToDouble(i -> {
+                    double n = numbers.get(i);
+                    
+                    //The getter for FoodItem is getFood() if different, just change this line.
+                    double foodValue = foods.get(i).getFoodID();
+
+                    return n * foodValue;
+                })
+                .boxed()
+                .collect(Collectors.toList());
+    }
+
 }
