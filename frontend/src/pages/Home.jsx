@@ -2,14 +2,17 @@ import DefaultLayout from "@/layouts/default";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Food from "@/images/Food Stock Photo 1.jpg";
+import Food from "@/images/Homepage Image.jpg";
 
 import { button as buttonStyles } from "@heroui/theme";
 import { Button } from "@heroui/react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home()
 {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -38,7 +41,7 @@ export default function Home()
           Track daily nutrients with barcode scans or quick manual entry, and visualize your trends over time.
         </p>
         <Button
-          onPress={() => navigate("/add")}
+          onPress={() => navigate(user == null ? "/register" : "/add")}
           style={{
             marginTop: "25px",
             paddingTop: "23px",

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { Link } from "@heroui/link";
 import {
   Navbar as HeroUINavbar,
@@ -14,7 +13,7 @@ import clsx from "clsx";
 
 import { siteConfig } from "@/site-config";
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);

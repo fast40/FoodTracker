@@ -4,6 +4,7 @@ const AuthContext = createContext(undefined);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -30,6 +31,12 @@ export function AuthProvider({ children }) {
       const json = await response.json();
       setUser(json.username);
     }
+    else if (response.status == 401) {
+      setMessage("*Incorrect credentials!");
+    }
+    else {
+      setMessage("*Internal error - please try again.");
+    }
 
     return response;
   };
@@ -46,7 +53,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, message, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

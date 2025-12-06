@@ -5,18 +5,24 @@ export const siteConfig = {
   description: "Track daily nutrients with barcode scans and charts.",
   navLeft: [
     {
+      label: "Scan",
+      href: "/scan",
+      show: "logged_out",
+    },
+    {
       label: "Add Food",
       href: "/add",
-      show: "always",
+      show: "logged_in",
     },
     {
       label: "Dashboard",
       href: "/dashboard",
+      show: "logged_in",
     },
     {
       label: "History",
       href: "/history",
-      show: "always",
+      show: "logged_in",
     },
   ],
   navRight: [
