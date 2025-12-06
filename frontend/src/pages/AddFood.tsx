@@ -309,10 +309,7 @@ export default function AddFood() {
           <ModalContent>
             {(onClose) => (
               <>
-                <ModalHeader className="flex flex-col gap-1">
-                  {authMode === "login" ? "Login" : "Register"}
-                </ModalHeader>
-                <ModalBody>
+                <ModalBody className="mt-4 mb-2">
                   {authMode === "login" ? (
                     <LoginForm onSuccess={onClose} />
                   ) : (

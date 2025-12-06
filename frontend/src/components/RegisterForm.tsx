@@ -33,7 +33,7 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
 
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-semibold mb-4">Register</h1>
+      <h1 className="text-2xl font-semibold mb-6">Register</h1>
       <p className="text-1xl text-red-400 mb-3">
         <i>{message}</i>
       </p>
