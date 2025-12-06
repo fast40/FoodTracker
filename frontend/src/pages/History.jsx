@@ -288,10 +288,7 @@ export default function History() {
   //Prefer backend if available; otherwise show placeholder data
   const allDays =
     backendDays.length > 0
-      ? backendDays
-      : Array.isArray(testDays)
-      ? testDays
-      : [];
+      ? backendDays : [];
   // If backend returned empty → show empty. DO NOT use test data on History page.
   // const allDays = backendDays;
 
