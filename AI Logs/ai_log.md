@@ -1,5 +1,3 @@
-TEAMMATE 1:
-
 AI Tools Used:
 > Claude
 
@@ -20,8 +18,7 @@ Specific Prompts
     > Attached Dashboard (Servlet)
 
 
-
-TEAMMATE 2:
+--------------------------------------------------
 
 In order to ensure that the copilot's generation is aligned with the API documentation, I copied the USDA food API schema from their OpenAPI documentation into `docs/`, and attached it in a conversation with copilot. I sent the following propmt together:
 
@@ -33,9 +30,7 @@ Aligned with my observation, the copilot identified that the existing database s
 
 After the copilot update the database schemas, I instructed it to update the Java code to integrate the API. Finding that it hardcoded the API key, I asked it to instead read it from a `.env` file. I also asked it to provide type definitions for the front end team to work on.
 
-
-
-TEAMMATE 3:
+--------------------------------------------------
 
 AI Tools Used:
 > ChatGPT
@@ -75,8 +70,7 @@ This process demonstrates how using AI prompts is useful not only for generating
 a manually sorted legend, the second AI prompt helped me understand that there was a simpler and more user-friendly approach. By keeping the alphabetical order and 
 instead displaying the bars in that order, the dashboard is easier to read (the same items are always on the same side of the legend, for example), and the code is simpler to understand.
 
-
-TEAMMATE 4:
+--------------------------------------------------
 
 AI Tools Used:
 > ChatGPT
@@ -114,6 +108,53 @@ These changes made sure that the History page displays the right nutrient values
 4) Explanation (depth):
 Fixing these problems was important because incorrect nutrient-to-ID mapping breaks every nutrient calculation on the History page, including totals, averages, daily chips, and table columns. Servings also play a major role in accurate nutrition tracking. Making sure that the transformation function matches backend IDs correctly and preserves servings guarantees consistency across the entire UI and prevents misleading nutrition data.
 
+--------------------------------------------------
 
+I didn't use AI to write any code until around 2 hours before the code deadline in an attempt to learn and understand the codebase as much as possible.
 
-//TODO: fill out AI logs for remaining teammates
+During the majority of the project, I used AI in addition to standard google searches to learn how to do the things I was trying to do. Here is an example exchange from this type of AI use:
+
+prompt: each of these items now has an attribute called "show". If show is always, it should always be shown. if it's logged_in, it should only be shown when {user} is not null. if it's logged_out, it should only be shown when the it IS null. Explain how to accomplish this.
+
+          {siteConfig.navLeft.map((item) => (
+            <NavbarItem key={item.href}>
+              <Link
+                className={clsx(
+                  linkStyles({ color: "white" }),
+                  "data-[active=true]:text-primary data-[active=true]:font-medium"
+                )}
+                color="white"
+                href={item.href}
+              >
+                {item.label}
+              </Link>
+            </NavbarItem>
+          ))}
+
+ChatGPT 5.1 Thinking responded with two options. I could either use .filter() before the map, or I could use an early return of null from within the function passed to .map(). After reading this and using google for a quick refresher .filter() works in js, I decided I liked the first option that the AI provided. I then typed it out myself in the text editor to help me remember this in the future.
+
+During the last phase of the project, I was working on using threading to parallelize a for loop that contained multiple SQL queries. Here are the prompts from this exchange:
+
+prompt 1: I have this rough outline. Instead of converting each food item into a single number and returning an array of numbers, I want to return the same list of fooditems but with all of the nutrient values multiplied.
+<pasted code>
+
+prompt 2: Inside of dailyfoodlog there is an arraylist of fooditems. Add another for loop after this for loop to allow this calculation to be run on each day's list of fooditems in parallel.
+<pasted code>
+
+prompt 3: Actually maybe you should combine this with the original function. Make a single function that takes in a DailyFoodLog and pulls every individual foodItem from it and multiples that in its own thread. Let's try that and see how it looks.
+
+prompt 4: Actually at this point we may as well get each food log in parallel instead of this. LogEntry has a quantity() field.
+<pasted code>
+
+prompt 5: So that just gets the food in parallel for each day?
+
+prompt 6: Why split into chunks? Why not just run a thread for each individual foodItem?
+
+By the end of this exchange I had learned a few things and also had some code to accomplish my goal. However, I had an issue.
+
+issue/fix 1: the code provided by ChatGPT 5.1 Thinking used a getter method that did not exist in our codebase. So I manually created it and tried to run again.
+
+issue/fix 2: the code provided by the AI also used doubles where the rest of the codebase used floats. I manually changes this as well.
+
+explanation: I was able to iterate with the AI to slightly change what I was originally trying to do and generate code that I understood well. However, the AI didn't have full knowledge of the codebase and tried to use methods that weren't there and incorrect datatypes. These errors were fairly simple, so I just manually created the infrastructure that it was expecting and fixed the small mistakes that it made.
+
