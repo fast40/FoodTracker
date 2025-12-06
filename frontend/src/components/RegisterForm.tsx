@@ -1,6 +1,7 @@
 import { useState, FormEvent } from "react";
 import { Form, Input, Button } from "@heroui/react";
 import { useAuth } from "@/context/AuthContext";
+import { api } from "@/services/api";
 
 export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
   const [message, setMessage] = useState("");
@@ -21,13 +22,7 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
     }
 
     try {
-      await fetch("http://localhost:8080/food-tracker/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
-
+      await api.auth.register(formData);
       await login(formData);
       if (onSuccess) onSuccess();
     } catch (e) {

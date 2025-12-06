@@ -8,7 +8,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import database.helpers.Enumerations.NutrientType;
 import database.wrappers.FoodItem;
 import database.wrappers.Nutrient;
 
@@ -186,19 +185,20 @@ public class FoodDAO {
     }
 
     private List<Nutrient> GetNutrients(Integer food_id) {
-        String  query = "SELECT * FROM food_nutrient_values WHERE food_id = ?";
+        String query = "SELECT fnv.amount, nd.name, nd.unit_name, nd.nutrient_id, nd.nutrient_number " +
+                       "FROM food_nutrient_values fnv " +
+                       "JOIN nutrient_definitions nd ON fnv.nutrient_id = nd.nutrient_id " +
+                       "WHERE fnv.food_id = ?";
         List<Nutrient> nutrients = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, food_id);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Integer nutrientID = rs.getInt("nutrient_id");
-                String name = NutrientType.fromId(nutrientID).getName();
-                // nutrient number is being ignored right now becuase I dont want to do a third lookup
-                String nutrientNumber = "";
+                String name = rs.getString("name");
+                String nutrientNumber = rs.getString("nutrient_number");
                 Float amount = rs.getFloat("amount");
-                String unitName = "no units";
-                //String unitName = rs.getString("unit_name");
+                String unitName = rs.getString("unit_name");
 
                 Nutrient nutrient = new Nutrient(nutrientID, name, nutrientNumber, amount, unitName);
                 nutrients.add(nutrient);

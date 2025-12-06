@@ -1,16 +1,26 @@
+export enum NutrientID {
+  Protein = 1003,
+  Fat = 1004,
+  Carbs = 1005,
+  Energy = 1008,
+  Fiber = 1079,
+  Sodium = 1093,
+  Sugar = 2000,
+}
+
 export interface Nutrient {
   nutrientId: number;
-  name: string;
-  number: string; // USDA nutrient number (e.g. "203")
+  name?: string;
+  number?: string;
   amount: number;
-  unitName: string;
+  unitName?: string;
 }
 
 export interface FoodItem {
-  foodId?: number; // Database ID (optional for new items)
-  fdcId?: number; // USDA ID
+  foodId?: number;
+  fdcId?: number;
   description: string;
-  dataType?: string; // 'Branded', 'Foundation', 'User', etc.
+  dataType?: string;
   brandOwner?: string;
   gtinUpc?: string;
   servingSize?: number;
@@ -19,16 +29,29 @@ export interface FoodItem {
   nutrients: Nutrient[];
 }
 
+// Unified Model: Used for both Reading History and Writing New Logs
+export interface FoodLogEntry {
+  logId?: number; // Optional for new logs
+  food: FoodItem;
+  quantity: number; // Servings
+  logDate: string; // ISO timestamp
+  mealType: "breakfast" | "lunch" | "dinner" | "snack";
+}
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  darkMode: boolean;
+  notificationsEnabled: boolean;
+  languageCode: string;
+  showCalories: boolean;
+  dailyCalorieGoal: number;
+  createdAt: string;
+}
+
 // Current API Response Structure
 export interface DailyFoodLog {
   date: string;
   foods: FoodLogEntry[];
-}
-
-export interface FoodLogEntry {
-  logId: number;
-  food: FoodItem;
-  quantity: number; // Number of servings
-  logDate: string; // ISO timestamp
-  mealType: "breakfast" | "lunch" | "dinner" | "snack";
 }

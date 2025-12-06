@@ -6,34 +6,29 @@ import {
   ReactNode,
 } from "react";
 
+import { User } from "@/types";
+import { api } from "@/services/api";
+
 interface AuthContextType {
-  user: string | null;
+  user: User | null;
   message: string;
-  login: (credentials: {
-    username: string;
-    password: string;
-  }) => Promise<Response>;
-  logout: () => Promise<any>;
+  login: (credentials: { username: string; password: string }) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
     (async () => {
-      const response = await fetch(
-        "http://localhost:8080/food-tracker/api/me",
-        {
-          credentials: "include",
-        }
-      );
-
-      if (response.status === 200) {
-        const json = await response.json();
-        setUser(json.username);
+      try {
+        const user = await api.auth.me();
+        setUser(user);
+      } catch (e) {
+        // Not logged in
       }
     })();
   }, []);
@@ -45,39 +40,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     username: string;
     password: string;
   }) => {
-    const response = await fetch(
-      "http://localhost:8080/food-tracker/api/login",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ username, password }),
+    try {
+      const user = await api.auth.login({ username, password });
+      setUser(user);
+      setMessage("");
+    } catch (e: any) {
+      if (e.message.includes("401")) {
+        setMessage("*Incorrect credentials!");
+      } else {
+        setMessage("*Internal error - please try again.");
       }
-    );
-
-    if (response.status === 200) {
-      const json = await response.json();
-      setUser(json.username);
-    } else if (response.status == 401) {
-      setMessage("*Incorrect credentials!");
-    } else {
-      setMessage("*Internal error - please try again.");
+      throw e;
     }
-
-    return response;
   };
 
   const logout = async () => {
-    const response = await fetch(
-      "http://localhost:8080/food-tracker/api/logout",
-      {
-        credentials: "include",
-      }
-    ).then((response) => response.json());
-
+    await api.auth.logout();
     setUser(null);
-
-    return response;
   };
 
   return (

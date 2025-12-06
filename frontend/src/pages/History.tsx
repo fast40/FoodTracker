@@ -2,9 +2,7 @@ import DefaultLayout from "@/layouts/default";
 import { useEffect, useMemo, useState } from "react";
 import { useRangeData } from "@/hooks/dashboardData";
 import { Button } from "@heroui/react";
-import { BASE_NUTRIENTS } from "@/data";
-
-const STORAGE_KEY = "nutrientVisibility";
+import { NUTRIENT_DEFINITIONS, STORAGE_KEY, DEFAULT_VISIBILITY } from "@/data";
 
 //helper function --> add/bubtract days from a year-month-day string
 //                --> use this to calculate the date range for backend queries
@@ -14,66 +12,12 @@ function addDays(start: string | Date, n: number) {
   return d.toISOString();
 }
 
-//Nutrients:
-//logicalKey --> used in UI and visibility settings
-//dataKey --> the key from backend data (energy_kcal, carbs_g, and more)
-//label --> UI label
-//unit --> units for display
-//id --> numeric nutrient ID from backend, using BASE_NUTRIENTS lookup
-//
-//this allows us to unify: backend naming, local naming, display
-//need calories, protein, carbs, fat, fiber, sodium, sugars
-const NUTRIENTS = [
-  {
-    logicalKey: "calories",
-    dataKey: "energy_kcal",
-    label: "Calories",
-    unit: "kcal",
-    id: BASE_NUTRIENTS.find((n) => n.settingsKey === "calories")?.id,
-  },
-  {
-    logicalKey: "protein",
-    dataKey: "protein_g",
-    label: "Protein",
-    unit: "g",
-    id: BASE_NUTRIENTS.find((n) => n.settingsKey === "protein")?.id,
-  },
-  {
-    logicalKey: "carbs",
-    dataKey: "carbs_g",
-    label: "Carbs",
-    unit: "g",
-    id: BASE_NUTRIENTS.find((n) => n.settingsKey === "carbs")?.id,
-  },
-  {
-    logicalKey: "fat",
-    dataKey: "fat_g",
-    label: "Fat",
-    unit: "g",
-    id: BASE_NUTRIENTS.find((n) => n.settingsKey === "fat")?.id,
-  },
-  {
-    logicalKey: "fiber",
-    dataKey: "fiber_g",
-    label: "Fiber",
-    unit: "g",
-    id: BASE_NUTRIENTS.find((n) => n.settingsKey === "fiber")?.id,
-  },
-  {
-    logicalKey: "sodium",
-    dataKey: "sodium_mg",
-    label: "Sodium",
-    unit: "mg",
-    id: BASE_NUTRIENTS.find((n) => n.settingsKey === "sodium")?.id,
-  },
-  {
-    logicalKey: "sugars",
-    dataKey: "sugars_g",
-    label: "Sugars",
-    unit: "g",
-    id: BASE_NUTRIENTS.find((n) => n.settingsKey === "sugars")?.id,
-  },
-];
+//daily values for computing %DV
+//FDA Daily Recommended Values
+const DAILY_VALUES = NUTRIENT_DEFINITIONS.reduce(
+  (acc, n) => ({ ...acc, [n.settingsKey]: n.defaultDV }),
+  {} as Record<string, number>
+);
 
 //Top UI tabs for range selection (either all or the last 7 days)
 const RANGE_OPTIONS = [
@@ -81,33 +25,10 @@ const RANGE_OPTIONS = [
   { id: "last7", label: "Last 7 days" },
 ];
 
-//default on/off visibility for nutrients
-const DEFAULT_VISIBILITY = {
-  calories: true,
-  protein: true,
-  carbs: true,
-  fat: true,
-  fiber: true,
-  sodium: true,
-  sugars: true,
-};
-
-//daily values for computing %DV
-//FDA Daily Recommended Values
-const DAILY_VALUES = {
-  calories: 2000,
-  protein: 50,
-  carbs: 275,
-  fat: 78,
-  fiber: 28,
-  sodium: 2300,
-  sugars: 50,
-};
-
 //create an empty object
 function createEmptyTotals() {
   const totals: Record<string, number> = {};
-  NUTRIENTS.forEach((n) => {
+  NUTRIENT_DEFINITIONS.forEach((n) => {
     totals[n.dataKey] = 0;
   });
   return totals;
@@ -126,7 +47,7 @@ function computeDayTotals(day: any) {
     const servings = entry?.consumed?.servings ?? 1;
 
     //loop through every nutrient that are tracked (calories, protein, carbs, etc)
-    NUTRIENTS.forEach((n) => {
+    NUTRIENT_DEFINITIONS.forEach((n) => {
       //pull the nutrient value for this food: ex: entry.nutrients["protein_g"]
       //if it's missing, default to 0
       const value = (entry?.nutrients?.[n.dataKey] || 0) * servings;
@@ -144,7 +65,7 @@ function computeTotalsForDays(days: any[]) {
 
   days.forEach((day) => {
     const dayTotals = computeDayTotals(day);
-    NUTRIENTS.forEach((n) => {
+    NUTRIENT_DEFINITIONS.forEach((n) => {
       totals[n.dataKey] += dayTotals[n.dataKey] || 0;
     });
   });
@@ -225,8 +146,8 @@ function transformBackendDays(rawDays: DailyFoodLog[]) {
       const nutrientsObj: Record<string, number> = {};
       //loop through all backend nutrients for this food
       (entry.food.nutrients || []).forEach((nut) => {
-        //find the matching nutrient definition from NUTRIENTS by nutrientId
-        const match = NUTRIENTS.find((n) => n.id === nut.nutrientId);
+        //find the matching nutrient definition from NUTRIENT_DEFINITIONS by nutrientId
+        const match = NUTRIENT_DEFINITIONS.find((n) => n.id === nut.nutrientId);
         if (match) {
           nutrientsObj[match.dataKey] = nut.amount ?? 0;
         }
@@ -308,7 +229,7 @@ export default function History() {
     const averages = createEmptyTotals();
     const dayCount = visibleDays.length || 1;
 
-    NUTRIENTS.forEach((n) => {
+    NUTRIENT_DEFINITIONS.forEach((n) => {
       averages[n.dataKey] = totals[n.dataKey] / dayCount;
     });
 
@@ -364,17 +285,17 @@ export default function History() {
             </p>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {NUTRIENTS.map((n) => {
-                if (!visibility[n.logicalKey as keyof typeof visibility])
+              {NUTRIENT_DEFINITIONS.map((n) => {
+                if (!visibility[n.settingsKey as keyof typeof visibility])
                   return null;
 
                 const avg = overviewAverages[n.dataKey] || 0;
                 const total = overviewTotals[n.dataKey] || 0;
-                const percentDV = getDailyValuePercent(n.logicalKey, avg);
+                const percentDV = getDailyValuePercent(n.settingsKey, avg);
 
                 return (
                   <div
-                    key={n.logicalKey}
+                    key={n.settingsKey}
                     className="rounded-2xl border border-default-100/40 bg-default-50 px-4 py-3 shadow-sm"
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -460,20 +381,20 @@ export default function History() {
 
                   {/* Chip badges showing nutrient totals */}
                   <div className="flex flex-wrap gap-2 mb-3 text-xs">
-                    {NUTRIENTS.filter(
+                    {NUTRIENT_DEFINITIONS.filter(
                       (n) =>
-                        n.logicalKey !== "calories" &&
-                        visibility[n.logicalKey as keyof typeof visibility]
+                        n.settingsKey !== "calories" &&
+                        visibility[n.settingsKey as keyof typeof visibility]
                     ).map((n) => {
                       const amount = totals[n.dataKey] || 0;
                       const percentDV = getDailyValuePercent(
-                        n.logicalKey,
+                        n.settingsKey,
                         amount
                       );
 
                       return (
                         <div
-                          key={n.logicalKey}
+                          key={n.settingsKey}
                           className="inline-flex items-center gap-1 rounded-full bg-default-100/10 border border-default-100/30 px-3 py-1"
                         >
                           <span className="text-default-500">{n.label}</span>
@@ -511,18 +432,18 @@ export default function History() {
                           </th>
 
                           {/* Create a column for each visible nutrient */}
-                          {NUTRIENTS.filter(
+                          {NUTRIENT_DEFINITIONS.filter(
                             (n) =>
                               visibility[
-                                n.logicalKey as keyof typeof visibility
+                                n.settingsKey as keyof typeof visibility
                               ]
                           ).map((n) => (
                             <th
-                              key={n.logicalKey}
+                              key={n.settingsKey}
                               className="px-2 py-1 text-right font-medium text-default-400"
                             >
                               {n.label}
-                              {n.logicalKey !== "calories" && n.unit
+                              {n.settingsKey !== "calories" && n.unit
                                 ? ` (${n.unit})`
                                 : ""}
                             </th>
@@ -552,14 +473,14 @@ export default function History() {
                               </td>
 
                               {/* Every visible nutrient is shown per food entry */}
-                              {NUTRIENTS.filter(
+                              {NUTRIENT_DEFINITIONS.filter(
                                 (n) =>
                                   visibility[
-                                    n.logicalKey as keyof typeof visibility
+                                    n.settingsKey as keyof typeof visibility
                                   ]
                               ).map((n) => (
                                 <td
-                                  key={n.logicalKey}
+                                  key={n.settingsKey}
                                   className="px-2 py-1 text-right text-default-200"
                                 >
                                   {Math.round(

@@ -14,9 +14,13 @@ import {
   CartesianGrid,
   ReferenceLine,
 } from "recharts";
-import { BASE_NUTRIENTS, DEFAULT_DV, UNITS, PALETTE } from "@/data";
-
-const STORAGE_KEY = "nutrientVisibility";
+import {
+  BASE_NUTRIENTS,
+  DEFAULT_DV,
+  UNITS,
+  PALETTE,
+  STORAGE_KEY,
+} from "@/data";
 
 function loadVisibility() {
   if (typeof window === "undefined") return {};

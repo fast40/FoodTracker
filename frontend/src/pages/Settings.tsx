@@ -1,31 +1,9 @@
 import { useState } from "react";
 import DefaultLayout from "@/layouts/default";
 import { Button } from "@heroui/react";
-
-const STORAGE_KEY = "nutrientVisibility";
+import { NUTRIENT_DEFINITIONS, STORAGE_KEY, DEFAULT_VISIBILITY } from "@/data";
 
 type Visibility = Record<string, boolean>;
-
-const NUTRIENTS = [
-  { key: "calories", label: "Calories" },
-  { key: "protein", label: "Protein" },
-  { key: "carbs", label: "Carbs" },
-  { key: "fat", label: "Fat" },
-  { key: "fiber", label: "Fiber" },
-  { key: "sodium", label: "Sodium" },
-  { key: "sugars", label: "Sugars" },
-];
-
-// default nutrient visibility, set to true
-const DEFAULT_VISIBILITY = {
-  calories: true,
-  protein: true,
-  carbs: true,
-  fat: true,
-  fiber: true,
-  sodium: true,
-  sugars: true,
-};
 
 function loadInitialVisibility() {
   if (typeof window === "undefined") return DEFAULT_VISIBILITY;
@@ -57,14 +35,14 @@ export default function Settings() {
 
   const selectAll = () => {
     const updated: Visibility = {};
-    NUTRIENTS.forEach((n) => (updated[n.key] = true));
+    NUTRIENT_DEFINITIONS.forEach((n) => (updated[n.settingsKey] = true));
     setVisibleNutrients(updated);
     setSaved(false);
   };
 
   const clearAll = () => {
     const updated: Visibility = {};
-    NUTRIENTS.forEach((n) => (updated[n.key] = false));
+    NUTRIENT_DEFINITIONS.forEach((n) => (updated[n.settingsKey] = false));
     setVisibleNutrients(updated);
     setSaved(false);
   };
@@ -97,18 +75,37 @@ export default function Settings() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {NUTRIENTS.map((nutrient) => (
-            <label
-              key={nutrient.key}
-              className="flex items-center gap-2 border border-default-200 rounded-lg px-3 py-2 cursor-pointer hover:bg-default-50"
+          {NUTRIENT_DEFINITIONS.map((n) => (
+            <div
+              key={n.settingsKey}
+              className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-default-100"
+              onClick={() => toggleNutrient(n.settingsKey)}
             >
-              <input
-                type="checkbox"
-                checked={!!visibleNutrients[nutrient.key]}
-                onChange={() => toggleNutrient(nutrient.key)}
-              />
-              <span>{nutrient.label}</span>
-            </label>
+              <span>{n.label}</span>
+              <div
+                className={`w-5 h-5 rounded-full border ${
+                  visibleNutrients[n.settingsKey]
+                    ? "bg-primary border-primary"
+                    : "border-default-400"
+                }`}
+              >
+                {visibleNutrients[n.settingsKey] && (
+                  <svg
+                    className="w-full h-full text-white p-0.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={3}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                )}
+              </div>
+            </div>
           ))}
         </div>
 

@@ -1,15 +1,15 @@
 package servlets;
 
+import java.io.IOException;
+import java.security.Principal;
+import java.util.Map;
+
+import com.google.gson.Gson;
+
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.util.Map;
-import java.security.Principal;
-
-import com.google.gson.Gson;
 
 @WebServlet("/api/me")
 public class Me extends HttpServlet {
@@ -20,9 +20,12 @@ public class Me extends HttpServlet {
                 Principal principal = request.getUserPrincipal();
 
                 if (principal != null) {
+                        database.data_access.UserDAO userDAO = new database.data_access.UserDAO();
+                        database.data_transfer.User user = userDAO.getUserByUsername(principal.getName());
+                        
                         response.setStatus(HttpServletResponse.SC_OK);
                         response.setContentType("application/json");
-                        response.getWriter().write(gson.toJson(Map.of("username", request.getUserPrincipal().getName())));
+                        response.getWriter().write(gson.toJson(user));
                 } else {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         response.setContentType("application/json");

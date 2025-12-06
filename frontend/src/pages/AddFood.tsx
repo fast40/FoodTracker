@@ -16,6 +16,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { LoginForm } from "@/components/LoginForm";
 import { RegisterForm } from "@/components/RegisterForm";
+import { FoodLogEntry, NutrientID } from "@/types";
+import { api } from "@/services/api";
+import { NUTRIENT_DEFINITIONS, STORAGE_KEY, DEFAULT_VISIBILITY } from "@/data";
 
 // button component from heroui
 import {
@@ -29,43 +32,8 @@ import {
   useDisclosure,
 } from "@heroui/react";
 
-// *** new: storage key is the same as the one used in history/daygraph/settings ***
-const STORAGE_KEY = "nutrientVisibility";
-
-// nutrients the user can type in on this form (should be the same in all files)
-const NUTRIENT_FIELDS = [
-  { key: "energy_kcal", label: "Calories", unit: "kcal" },
-  { key: "protein_g", label: "Protein", unit: "g" },
-  { key: "carbs_g", label: "Carbs", unit: "g" },
-  { key: "fat_g", label: "Fat", unit: "g" },
-  { key: "fiber_g", label: "Fiber", unit: "g" },
-  { key: "sodium_mg", label: "Sodium", unit: "mg" },
-  { key: "sugars_g", label: "Sugars", unit: "g" },
-];
-
-// *** new: map between the nutrient keys and the logical keys used in settings ***
-// settings object in localstorage uses keys like "calories", "protein", etc
-const FIELD_TO_SETTINGS_KEY = {
-  energy_kcal: "calories",
-  protein_g: "protein",
-  carbs_g: "carbs",
-  fat_g: "fat",
-  fiber_g: "fiber",
-  sodium_mg: "sodium",
-  sugars_g: "sugars",
-};
-
 // default visibility if localstorage is empty or broken
 // same structure as in your other files: all on by default
-const DEFAULT_VISIBILITY = {
-  calories: true,
-  protein: true,
-  carbs: true,
-  fat: true,
-  fiber: true,
-  sodium: true,
-  sugars: true,
-};
 
 // base url for your tomcat backend
 const API_BASE = "http://localhost:8080/food-tracker";
@@ -99,9 +67,13 @@ export default function AddFood() {
   // number of servings the user ate (string)
   const [servings, setServings] = useState("1");
 
+  // serving size details from scan
+  const [servingSize, setServingSize] = useState<number | null>(null);
+  const [servingSizeUnit, setServingSizeUnit] = useState<string | null>(null);
+
   // nutrient values for each field above (string)
   const [nutrients, setNutrients] = useState(() =>
-    Object.fromEntries(NUTRIENT_FIELDS.map((f) => [f.key, ""]))
+    Object.fromEntries(NUTRIENT_DEFINITIONS.map((f) => [f.dataKey, ""]))
   );
 
   // *** new: visibility state for this page, loaded from localstorage ***
@@ -143,6 +115,8 @@ export default function AddFood() {
 
       // Populate form
       setName(data.description || "");
+      setServingSize(data.servingSize || null);
+      setServingSizeUnit(data.servingSizeUnit || null);
 
       // Map nutrients
       const newNutrients = { ...nutrients };
@@ -181,9 +155,8 @@ export default function AddFood() {
 
   // *** new: choose which nutrient fields to actually render based on settings ***
   // if a nutrient's logical key is turned off in settings, we hide that input
-  const visibleFields = NUTRIENT_FIELDS.filter((field) => {
-    const logicalKey =
-      FIELD_TO_SETTINGS_KEY[field.key as keyof typeof FIELD_TO_SETTINGS_KEY];
+  const visibleFields = NUTRIENT_DEFINITIONS.filter((field) => {
+    const logicalKey = field.settingsKey;
     if (!logicalKey) return true; // if mapping missing, show it rather than hiding
 
     const flag = visibility[logicalKey as keyof typeof visibility];
@@ -204,37 +177,25 @@ export default function AddFood() {
     setError(null);
     setSaving(true);
 
+    // 2. build the payload using the Unified FoodLogEntry structure
+    const payload: FoodLogEntry = {
+      quantity: parseFloat(servings) || 1,
+      mealType: "snack", // TODO: Add meal selector to UI
+      logDate: new Date().toISOString(), // TODO: Add date selector to UI
+      food: {
+        description: name,
+        servingSize: servingSize || 1,
+        servingSizeUnit: servingSizeUnit || "serving",
+        nutrients: NUTRIENT_DEFINITIONS.map((field) => ({
+          nutrientId: field.id,
+          amount:
+            parseFloat(nutrients[field.dataKey as keyof typeof nutrients]) || 0,
+        })).filter((n) => n.amount > 0),
+      },
+    };
+
     try {
-      // build the payload that we will send to the backend
-      const payload: any = {
-        name,
-        servings: Number(servings) || 1,
-        nutrients: {},
-      };
-
-      // copy only numeric nutrient values into payload.nutrients
-      // note: we loop over all fields, not just visibleFields,
-      // so settings affect the ui only, not the json structure
-      for (const field of NUTRIENT_FIELDS) {
-        const raw = nutrients[field.key as keyof typeof nutrients];
-        if (raw !== "" && !isNaN(Number(raw))) {
-          payload.nutrients[field.key] = Number(raw);
-        }
-      }
-
-      // make a post request to /api/log-item servlet
-      // on the backend --> need to add a doPost that reads json from the request body and saves it in the database
-      const res = await fetch(`${API_BASE}/api/log-item`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
-
-      // if http status is not 2xx, then treat it as an error
-      if (!res.ok) {
-        throw new Error(`http ${res.status}`);
-      }
+      await api.food.log(payload);
 
       // if success, go back to the dashboard so the user can see the updated charts (after the backend reads from db)
       navigate("/dashboard");
@@ -301,15 +262,15 @@ export default function AddFood() {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full">
             {visibleFields.map((field) => (
               <Input
-                key={field.key}
+                key={field.dataKey}
                 label={`${field.label} (${field.unit})`}
                 labelPlacement="outside"
                 type="number"
                 min="0"
                 step="any"
-                value={nutrients[field.key]}
+                value={nutrients[field.dataKey]}
                 onChange={(e) =>
-                  handleNutrientChange(field.key, e.target.value)
+                  handleNutrientChange(field.dataKey, e.target.value)
                 }
               />
             ))}
