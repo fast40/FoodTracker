@@ -26,8 +26,6 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.google.gson.JsonObject;
-
 @WebServlet("/api/dashboard")
 public class Dashboard extends HttpServlet {
     final String startRequest = "startDate";
@@ -106,10 +104,6 @@ public class Dashboard extends HttpServlet {
 
         UserDAO userDAO = new UserDAO();
         User user = userDAO.getUserByUsername(principal.getName());
-        // response.setHeader("Access-Control-Allow-Origin", "*");
-        // response.setHeader("Access-Control-Allow-Methods", "GET");
-        // response.setContentType("application/json");
-        // response.setCharacterEncoding("UTF-8");
 
         RequestData requestData = RequestJsonParser.parse(request, RequestData.class);
 
@@ -147,16 +141,7 @@ public class Dashboard extends HttpServlet {
         try {
             //get a log of all the foodIDs within the range
             history = historyDAO.GetHistory(user.id(), mysql_start, mysql_end, entryLimit);
-            // Map<LocalDate, DailyFoodLog> dailyFoodLog = new LinkedHashMap<>();
-
             Map<LocalDate, DailyFoodLog> dailyFoodLog = buildDailyFoodLogParallelized(history, userZone, foodDAO);
-
-            //for each foodID, get the associated FoodItem
-            // for (LogEntry log : history)  {
-            //     FoodItem item = foodDAO.getFoodById(log.foodId());
-            //     LocalDate localDate = log.date().toInstant().atZone(userZone).toLocalDate();
-            //     dailyFoodLog.computeIfAbsent(localDate, date -> new DailyFoodLog(date.toString())).addFood(item);
-            // }
 
             List<DailyFoodLog> dailyHistory = new ArrayList<>(dailyFoodLog.values());
             String json = gson.toJson(dailyHistory);

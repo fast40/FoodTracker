@@ -8,11 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -21,7 +16,6 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 
-import database.data_access.DatabaseConnection;
 import database.data_access.FoodDAO;
 import database.data_access.HistoryDAO;
 import database.data_access.UserDAO;
@@ -64,68 +58,11 @@ public class LogItem extends HttpServlet {
 
                 FoodEntry foodEntry = RequestJsonParser.parse(request, FoodEntry.class);
 
-                // try (
-                //         Connection connection = DatabaseConnection.getConnection();
-                //         PreparedStatement addItem = connection.prepareStatement("INSERT INTO simple_food_items (name, energy_kcal, protein_g, carbs_g, fat_g, fiber_g, sodium_mg, sugars_g, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-                //         PreparedStatement addLog = connection.prepareStatement("INSERT INTO simple_food_logs (user_id, food_id, quantity) VALUES (?, ?, ?)");
-                // ) {
-                //
-                //         addItem.setString(1, foodEntry.name);
-                //         addItem.setInt(2, foodEntry.nutrients.energy_kcal);
-                //         addItem.setInt(3, foodEntry.nutrients.protein_g);
-                //         addItem.setInt(4, foodEntry.nutrients.carbs_g);
-                //         addItem.setInt(5, foodEntry.nutrients.fat_g);
-                //         addItem.setInt(6, foodEntry.nutrients.fiber_g);
-                //         addItem.setInt(7, foodEntry.nutrients.sodium_mg);
-                //         addItem.setInt(8, foodEntry.nutrients.sugars_g);
-                //         addItem.setInt(9, user.id());
-                //
-                //         addItem.executeUpdate();
-                //
-                //         ResultSet resultSet = addItem.getGeneratedKeys();
-                //         resultSet.next();
-                //         long foodId = resultSet.getLong(1);
-                //
-                //         addLog.setInt(1, user.id());
-                //         addLog.setLong(2, foodId);
-                //         addLog.setFloat(3, foodEntry.servings());
-                //
-                //         addLog.executeUpdate();
-                //
-                //         System.out.println("added food item and log");
-                //
-                //         // TODO: return some json (success)
-                // } catch (SQLException e) {
-                //         e.printStackTrace();
-                //
-                //         response.sendRedirect(request.getContextPath() + "/login");
-                // }
-
                 FoodDAO foodDAO = new FoodDAO();
                 HistoryDAO historyDAO = new HistoryDAO();
 
                 FoodItem foodItem = new FoodItem();
                 List<Nutrient> nutrients = new ArrayList<>();
-
-                // foodItem.setCreatorID(1);
-                // foodItem.setDescription("Apple");
-                // foodItem.setDataType("User");
-                // foodItem.setServingSize(1.0f);
-                // foodItem.setServingSizeUnit("Apple");
-                // foodItem.setHouseholdServingFullText("1 Apple");
-                // nutrients.add(new Nutrient(NutrientType.ENERGY, 95));
-                // nutrients.add(new Nutrient(NutrientType.PROTEIN, 0.5f));
-                // nutrients.add(new Nutrient(NutrientType.CARBOHYDRATE, 25));
-                // nutrients.add(new Nutrient(NutrientType.FIBER, 4.4f));
-                // nutrients.add(new Nutrient(NutrientType.SUGARS_TOTAL, 19));
-                // nutrients.add(new Nutrient(NutrientType.VITAMIN_C, 8));
-                // foodItem.setNutrients(nutrients);
-                // System.out.println("Description: " + foodItem.getDescription());
-                // System.out.println("Serving Size: " + foodItem.getServingSize());
-                // System.out.println("Creator ID: " + foodItem.getCreatorID());
-                // System.out.println("Nutrients: " + foodItem.getNutrients().size());
-                // foodDAO.insertFoodItem(foodItem);
-                // System.out.println("added");
 
                 foodItem.setCreatorID(user.id());
                 foodItem.setDescription(foodEntry.name());
