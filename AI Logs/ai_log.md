@@ -61,4 +61,42 @@ Iteration sample:
 
 TEAMMATE 4:
 
+AI Tools Used:
+> ChatGPT
+
+1) Prompt: 
+“Write a helper function that loads nutrient visibility settings from localStorage. It should read the nutrientVisibility key, parse it safely, and fall back to default visibility settings if anything is missing.”
+
+2) Issue: 
+The AI produced a version that just grabbed the localStorage value and tried to parse it with JSON.parse without any protection which caused two major issues: 
+If the saved JSON was corrupted, the whole page crashed because the AI did not include error handling.
+It didn’t merge missing values with the default settings. Because of that the visibility object could have gaps that caused certain nutrient fields to disappear or behave incorrectly.
+
+3) Fix (correctness):
+I added proper error handling so that if the stored JSON is invalid, the app doesn’t crash and instead falls back to safe defaults
+I made sure that even when a user only changes some visibility settings, any missing ones are filled in automatically using default values 
+I made the function return a complete, clean visibility object every time, and it prevented undefined fields from breaking the UI
+
+4) Explanation (depth): 
+These fixes matter because without safety checks, the entire AddFood page would break whenever localStorage contained bad or incomplete data. By adding fallback logic and merging defaults, the visibility system stays consistent with the rest of the app, and the form always works correctly regardless of user settings or corrupted storage. This improves stability, user experience, and prevents unpredictable UI behavior.
+
+
+1) Prompt: 
+“Write a helper function that transforms the backend’s ‘days’ array into the format my History page expects. Each day should contain: date, entries[], and each entry should include id, name, nutrients, servings, and the time consumed.”
+
+2) Issue: 
+The first issue was that the AI didn’t match the backend nutrient IDs correctly. The AI assumed the nutrient IDs would match the keys directly (like "protein_g"), but my backend uses numeric IDs, and I must map them using the NUTRIENTS array. The incorrect assumption caused nutrients to show up as undefined or missing entirely in the History table.
+The second isse was that the AI ignored the serving field. The transformation always set servings to 1, even when the backend provided the correct servings under food.consumed.servings. This caused the final totals, averages, and daily nutrient chips to show the wrong numbers, making the history calculation inaccurate.
+
+3) Fix (correctness): 
+I rewrote the mapping logic so that each backend nutrient ID is properly matched to one of my defined NUTRIENTS objects. This makes sure every nutrient goes into the correct bucket (protein_g, carbs_g, etc.)
+I made sure servings are fully preserved by reading the servings value from the backend’s consumed object instead of defaulting to 1.
+I cleaned up the transformation structure so that the History page receives entries in the exact shape required by the daily totals calculator and table display.
+These changes made sure that the History page displays the right nutrient values, the right totals, and the right averages.
+
+4) Explanation (depth):
+Fixing these problems was important because incorrect nutrient-to-ID mapping breaks every nutrient calculation on the History page, including totals, averages, daily chips, and table columns. Servings also play a major role in accurate nutrition tracking. Making sure that the transformation function matches backend IDs correctly and preserves servings guarantees consistency across the entire UI and prevents misleading nutrition data.
+
+
+
 //TODO: fill out AI logs for remaining teammates
