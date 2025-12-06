@@ -3,13 +3,12 @@ package database.data_access;
 import com.mysql.cj.log.Log;
 import database.data_transfer.LogEntry;
 import database.helpers.Enumerations;
-import database.wrappers.FoodItem;     
+import database.wrappers.FoodItem; 
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;    
-import java.util.stream.IntStream;    
+
 
 
 public class HistoryDAO {
@@ -65,41 +64,108 @@ public class HistoryDAO {
         return history;
     }
 
-    /**
-     * Multithreaded demo method:
-     *  - takes a list of numbers (for example, quantities or multipliers)
-     *  - and a list of FoodItem objects of the same length
-     *  - converts each FoodItem to a numeric value
-     *  - multiplies the pair (number, foodValue) for each index
-     *
-     * The work is done in parallel using a parallel stream, which means
-     * Java will use multiple threads from the ForkJoinPool to process
-     * different indices at the same time.
+     /**
+     * Convert a FoodItem into a numeric value.
+     * Change this to whatever makes sense for your project
+     * (calories, protein, id, etc.).
      */
-    public List<Double> multiplyNumbersAndFoodsParallel(
+    private double getFoodNumericValue(FoodItem food) {
+        // TODO: replace this with a real property:
+        // e.g. return food.getCalories();
+        // I’m using getFoodID() as a placeholder.
+        return food.getFoodID();
+    }
+
+
+        /**
+     * Multithreaded multiplication using explicit Thread objects.
+     *
+     * - numbers: list of doubles (e.g., quantities or multipliers)
+     * - foods:   list of FoodItem objects (same size as numbers)
+     *
+     * For each index i, it computes:
+     *   result[i] = numbers[i] * getFoodNumericValue(foods[i])
+     *
+     * Work is split across several Worker threads, each handling a
+     * different chunk of indices in parallel.
+     */
+    public List<Double> multiplyNumbersAndFoodsWithThreads(
             List<Double> numbers,
             List<FoodItem> foods
-    ) {
+    ) throws InterruptedException {
+
         if (numbers == null || foods == null) {
             throw new IllegalArgumentException("Input lists must not be null");
         }
         if (numbers.size() != foods.size()) {
-            throw new IllegalArgumentException("Lists must be the same size");
+            throw new IllegalArgumentException("Lists must have the same size");
         }
 
-        // IntStream.range(...).parallel() = multithreading
-        return IntStream.range(0, numbers.size())
-                .parallel()  // <--- this is what makes it run on multiple threads
-                .mapToDouble(i -> {
-                    double n = numbers.get(i);
-                    
-                    //The getter for FoodItem is getFood() if different, just change this line.
-                    double foodValue = foods.get(i).getFoodID();
+        int size = numbers.size();
+        double[] results = new double[size];
 
-                    return n * foodValue;
-                })
-                .boxed()
-                .collect(Collectors.toList());
+        // Decide how many worker threads to use.
+        // Use up to one thread per CPU core, but not more than list size.
+        int cores = Runtime.getRuntime().availableProcessors();
+        int numThreads = Math.min(size, cores);
+        if (numThreads == 0) {
+            return new ArrayList<>();
+        }
+
+        // Inner worker class that extends Thread and processes a chunk
+        class Worker extends Thread {
+            private final int startIndex;
+            private final int endIndex; // exclusive
+
+            Worker(int startIndex, int endIndex) {
+                this.startIndex = startIndex;
+                this.endIndex = endIndex;
+            }
+
+            @Override
+            public void run() {
+                for (int i = startIndex; i < endIndex; i++) {
+                    double n = numbers.get(i);
+                    double foodValue = getFoodNumericValue(foods.get(i));
+                    results[i] = n * foodValue;
+                }
+            }
+        }
+
+        Worker[] workers = new Worker[numThreads];
+
+        // Compute chunk sizes (divide work across threads)
+        int chunkSize = (int) Math.ceil(size / (double) numThreads);
+        int currentStart = 0;
+
+        // Create and start each worker thread
+        for (int t = 0; t < numThreads; t++) {
+            int start = currentStart;
+            int end = Math.min(size, start + chunkSize);
+            if (start >= end) {
+                workers[t] = null; // no work for this one
+                continue;
+            }
+            workers[t] = new Worker(start, end);
+            workers[t].start();
+            currentStart = end;
+        }
+
+        // Wait for all worker threads to finish
+        for (Worker worker : workers) {
+            if (worker != null) {
+                worker.join();
+            }
+        }
+
+        // Convert primitive array to List<Double>
+        List<Double> resultList = new ArrayList<>(size);
+        for (double v : results) {
+            resultList.add(v);
+        }
+        return resultList;
     }
+
+
 
 }
