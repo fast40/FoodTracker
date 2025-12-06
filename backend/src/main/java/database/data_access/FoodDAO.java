@@ -1,12 +1,16 @@
 package database.data_access;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
 import database.helpers.Enumerations.NutrientType;
 import database.wrappers.FoodItem;
 import database.wrappers.Nutrient;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class FoodDAO {
     public FoodItem getFoodById(int food_id) {
@@ -43,7 +47,7 @@ public class FoodDAO {
     }
 
     public FoodItem getFoodByGTIN(String gtin) {
-        String query = "SELECT * FROM food_items WHERE food_gtin = ?";
+        String query = "SELECT * FROM food_items WHERE gtin_upc = ?";
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, gtin);
             ResultSet rs = stmt.executeQuery();
@@ -108,7 +112,7 @@ public class FoodDAO {
     }
 
     public int insertFoodItem(FoodItem food) {
-        String sql = "INSERT INTO food_items (fdc_id, description, data_type, brand_owner, serving_size, serving_size_unit, household_serving_full_text, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO food_items (fdc_id, description, data_type, brand_owner, gtin_upc, serving_size, serving_size_unit, household_serving_full_text, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -117,10 +121,11 @@ public class FoodDAO {
             stmt.setString(2, food.getDescription());
             stmt.setString(3, food.getDataType());
             stmt.setString(4, food.getBrandOwner());
-            stmt.setFloat(5, food.getServingSize());
-            stmt.setString(6, food.getServingSizeUnit());
-            stmt.setString(7, food.getHouseholdServingFullText());
-            stmt.setObject(8, food.getCreatorID());
+            stmt.setString(5, food.getGtinUpc());
+            stmt.setFloat(6, food.getServingSize());
+            stmt.setString(7, food.getServingSizeUnit());
+            stmt.setString(8, food.getHouseholdServingFullText());
+            stmt.setObject(9, food.getCreatorID());
 
             int rowsAffected = stmt.executeUpdate();
 

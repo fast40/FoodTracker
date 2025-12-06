@@ -51,7 +51,9 @@ public class FoodLookup extends HttpServlet {
             foodItem = USDAFoodAPI.fetchFoodByGTIN(gtin);
 
             if (foodItem != null) {
-                foodDAO.insertFoodItem(foodItem);
+                if (foodDAO.getFoodIdByFdcId(foodItem.getFdcId()) == null) {
+                    foodDAO.insertFoodItem(foodItem);
+                }
 
                 out.print(gson.toJson(foodItem));
             } else {
