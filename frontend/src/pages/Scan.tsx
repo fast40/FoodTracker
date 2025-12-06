@@ -1,26 +1,26 @@
-import React from "react";
 import DefaultLayout from "@/layouts/default";
 import { PhotoScanView } from "@/components/photoScanView";
 
 function Scan() {
-  const handleCode = async (upc) => {
+  const handleCode = async (upc: string) => {
     console.log("Scanned UPC:", upc);
     let gtin = upc;
     try {
       const params = new URLSearchParams({
-        gtin
+        gtin,
       });
-      const response = await fetch(`http://localhost:8080/food-tracker/api/food-lookup?${params.toString()}`,{
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      })
-      if (!response.ok)
-        throw new Error("Request failed");
+      const response = await fetch(
+        `http://localhost:8080/food-tracker/api/food-lookup?${params.toString()}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      if (!response.ok) throw new Error("Request failed");
 
       const json = await response.json();
       console.log(json);
-
-    } catch (err) {
+    } catch (err: any) {
       console.log("ERROR fetching from /api/food-lookup: " + err.message);
     }
   };

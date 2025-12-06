@@ -4,6 +4,8 @@ import { Button } from "@heroui/react";
 
 const STORAGE_KEY = "nutrientVisibility";
 
+type Visibility = Record<string, boolean>;
+
 const NUTRIENTS = [
   { key: "calories", label: "Calories" },
   { key: "protein", label: "Protein" },
@@ -40,13 +42,13 @@ function loadInitialVisibility() {
 }
 
 export default function Settings() {
-  const [visibleNutrients, setVisibleNutrients] = useState(
-    () => loadInitialVisibility()
+  const [visibleNutrients, setVisibleNutrients] = useState(() =>
+    loadInitialVisibility()
   );
   const [saved, setSaved] = useState(false);
 
-  const toggleNutrient = (key) => {
-    setVisibleNutrients((prev) => ({
+  const toggleNutrient = (key: string) => {
+    setVisibleNutrients((prev: Visibility) => ({
       ...prev,
       [key]: !prev[key],
     }));
@@ -54,14 +56,14 @@ export default function Settings() {
   };
 
   const selectAll = () => {
-    const updated = {};
+    const updated: Visibility = {};
     NUTRIENTS.forEach((n) => (updated[n.key] = true));
     setVisibleNutrients(updated);
     setSaved(false);
   };
 
   const clearAll = () => {
-    const updated = {};
+    const updated: Visibility = {};
     NUTRIENTS.forEach((n) => (updated[n.key] = false));
     setVisibleNutrients(updated);
     setSaved(false);
@@ -112,9 +114,7 @@ export default function Settings() {
 
         <div className="flex items-center justify-end gap-3">
           {saved && (
-            <span className="text-sm text-emerald-400">
-              Preferences saved
-            </span>
+            <span className="text-sm text-emerald-400">Preferences saved</span>
           )}
           <Button color="primary" onClick={handleSave}>
             Save Preferences

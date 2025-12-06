@@ -6,18 +6,17 @@ import { BASE_NUTRIENTS } from "@/data";
 
 const STORAGE_KEY = "nutrientVisibility";
 
-//helper function --> add/bubtract days from a year-month-day string 
-//                --> use this to calculate the date range for backend queries 
-function addDays(start, n) 
-{
-  const d = new Date(start); 
-  d.setDate(d.getDate() + n); 
+//helper function --> add/bubtract days from a year-month-day string
+//                --> use this to calculate the date range for backend queries
+function addDays(start: string | Date, n: number) {
+  const d = new Date(start);
+  d.setDate(d.getDate() + n);
   return d.toISOString();
 }
 
-//Nutrients: 
+//Nutrients:
 //logicalKey --> used in UI and visibility settings
-//dataKey --> the key from backend data (energy_kcal, carbs_g, and more) 
+//dataKey --> the key from backend data (energy_kcal, carbs_g, and more)
 //label --> UI label
 //unit --> units for display
 //id --> numeric nutrient ID from backend, using BASE_NUTRIENTS lookup
@@ -76,7 +75,6 @@ const NUTRIENTS = [
   },
 ];
 
-
 //Top UI tabs for range selection (either all or the last 7 days)
 const RANGE_OPTIONS = [
   { id: "all", label: "All history" },
@@ -106,22 +104,23 @@ const DAILY_VALUES = {
   sugars: 50,
 };
 
-
-//create an empty object 
+//create an empty object
 function createEmptyTotals() {
-  const totals = {};
-  NUTRIENTS.forEach((n) => {totals[n.dataKey] = 0;});
+  const totals: Record<string, number> = {};
+  NUTRIENTS.forEach((n) => {
+    totals[n.dataKey] = 0;
+  });
   return totals;
 }
 
-//compute the totals for a single day 
+//compute the totals for a single day
 //then loop through each entry (food item) and multiply the values by the servings
-function computeDayTotals(day) {
+function computeDayTotals(day: any) {
   //create an empty object with everything init to 0
   const totals = createEmptyTotals();
 
   //loop through every food entry for the given day
-  (day.entries || []).forEach((entry) => {
+  (day.entries || []).forEach((entry: any) => {
     //get the number of servings for this food entry
     //if servings is missing, default to 1
     const servings = entry?.consumed?.servings ?? 1;
@@ -138,9 +137,9 @@ function computeDayTotals(day) {
   return totals;
 }
 
-//this function loops through each day, it also computes that day's total and then adds them to the daily total 
-//compute the totals across many days 
-function computeTotalsForDays(days) {
+//this function loops through each day, it also computes that day's total and then adds them to the daily total
+//compute the totals across many days
+function computeTotalsForDays(days: any[]) {
   const totals = createEmptyTotals();
 
   days.forEach((day) => {
@@ -149,17 +148,15 @@ function computeTotalsForDays(days) {
       totals[n.dataKey] += dayTotals[n.dataKey] || 0;
     });
   });
-
   return totals;
 }
 
-
-//this is from the browser's localStorage 
-//allows the UI to remember the user's preference even after reefreshinf or closing the page 
-//if anything goes wrong 
+//this is from the browser's localStorage
+//allows the UI to remember the user's preference even after reefreshinf or closing the page
+//if anything goes wrong
 //load visibily settings this allows the UI to remember the user's preference even
 function loadVisibilityFromStorage() {
-  //if window doesn't exist 
+  //if window doesn't exist
   //we cannot access localStorage, so return defaults
   if (typeof window === "undefined") return DEFAULT_VISIBILITY;
 
@@ -186,14 +183,14 @@ function loadVisibilityFromStorage() {
 }
 
 //compute %DV = amount / dailyValue * 100
-function getDailyValuePercent(logicalKey, amount) {
-  const dv = DAILY_VALUES[logicalKey];
+function getDailyValuePercent(logicalKey: string, amount: number) {
+  const dv = DAILY_VALUES[logicalKey as keyof typeof DAILY_VALUES];
   if (!dv || amount == null) return null;
   return (amount / dv) * 100;
 }
 
 //convert different timestamp shapes into a HH:MM label
-function getEntryTimeLabel(entry) {
+function getEntryTimeLabel(entry: any) {
   const raw =
     entry?.consumed?.time ??
     entry?.consumed?.timestamp ??
@@ -210,24 +207,24 @@ function getEntryTimeLabel(entry) {
   return typeof raw === "string" ? raw : "";
 }
 
+import { DailyFoodLog } from "@/types";
+
 //converts the backend format into the local UI format
-function transformBackendDays(rawDays) {
+function transformBackendDays(rawDays: DailyFoodLog[]) {
   //if the response is not an array, safely return an empty list
   if (!Array.isArray(rawDays)) return [];
 
   //map each backend "day" object into a new transformed "day" object
   return rawDays.map((day) => {
     //convert each food item (from backend) into a UI-friendly entry object
-    const entries = (day.foods || []).map((food) => {
-      //extract consumed info. If missing, default to an empty object
-      const consumed = food.consumed || {};
+    const entries = (day.foods || []).map((entry) => {
       //use the logged servings; if missing, default to 1
-      const servings = consumed.servings ?? 1;
+      const servings = entry.quantity ?? 1;
 
       // Build nutrient mapping from backend IDs
-      const nutrientsObj = {};
+      const nutrientsObj: Record<string, number> = {};
       //loop through all backend nutrients for this food
-      (food.nutrients || []).forEach((nut) => {
+      (entry.food.nutrients || []).forEach((nut) => {
         //find the matching nutrient definition from NUTRIENTS by nutrientId
         const match = NUTRIENTS.find((n) => n.id === nut.nutrientId);
         if (match) {
@@ -238,37 +235,35 @@ function transformBackendDays(rawDays) {
       //return the transformed entry formatted exactly how the UI expects it
       return {
         //unique identifier for the food. Support both foodId and id
-        id: food.foodId ?? food.id,
-        name: food.description || food.name || "food",
+        id: entry.food.foodId,
+        name: entry.food.description,
         nutrients: nutrientsObj,
         consumed: {
           servings,
-          time: consumed.time || consumed.timestamp || day.date,
+          time: entry.logDate,
         },
       };
     });
 
     return {
-      date: day.date || day.day || null,
+      date: day.date,
       entries,
     };
   });
 }
-
 
 //main component
 export default function History() {
   //which tab is selected? ("all" or "last7")
   const [range, setRange] = useState("all");
 
-
-  //compute which start/end dates to request from backend. useMemo ensures this only recalculates when range changes 
+  //compute which start/end dates to request from backend. useMemo ensures this only recalculates when range changes
   const { startDateIso, endDateIso } = useMemo(() => {
     const today = new Date();
     const todayStr = today.toISOString().slice(0, 10);
 
     //up to tomorrow
-    const end = addDays(todayStr, 1); 
+    const end = addDays(todayStr, 1);
     const start =
       range === "last7"
         ? addDays(todayStr, -7) // last 7 days
@@ -277,18 +272,16 @@ export default function History() {
     return { startDateIso: start, endDateIso: end };
   }, [range]);
 
-  //Fetch backend SQL history 
+  //Fetch backend SQL history
   const backendRange = useRangeData(startDateIso, endDateIso);
   const backendDays = transformBackendDays(backendRange || []);
 
   //debug
   console.log("backendRange raw:", backendRange);
-  console.log("backendDays transformed:", backendDays); 
+  console.log("backendDays transformed:", backendDays);
 
   //Prefer backend if available; otherwise show placeholder data
-  const allDays =
-    backendDays.length > 0
-      ? backendDays : [];
+  const allDays = backendDays.length > 0 ? backendDays : [];
   // If backend returned empty → show empty. DO NOT use test data on History page.
   // const allDays = backendDays;
 
@@ -300,7 +293,6 @@ export default function History() {
     setVisibility(loadVisibilityFromStorage());
   }, []);
 
-
   //visibleDays = days to display based on the selected tab even through backend already returns the righ range, we explicitly slice last 7 days to match UI logic
   const visibleDays = useMemo(() => {
     if (range === "last7") {
@@ -309,8 +301,8 @@ export default function History() {
     return allDays;
   }, [range, allDays]);
 
-  //compute totals and averages across visible days 
-  //useMemo ensures recalculation only when visibleDays change 
+  //compute totals and averages across visible days
+  //useMemo ensures recalculation only when visibleDays change
   const { overviewTotals, overviewAverages } = useMemo(() => {
     const totals = computeTotalsForDays(visibleDays);
     const averages = createEmptyTotals();
@@ -329,7 +321,6 @@ export default function History() {
   return (
     <DefaultLayout>
       <div className="max-w-6xl mx-auto px-4 py-6 mt-4 space-y-8">
-        
         {/*HEADER */}
         <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
@@ -348,7 +339,6 @@ export default function History() {
               <Button
                 key={opt.id}
                 size="sm"
-                auto
                 radius="full"
                 color={range === opt.id ? "primary" : "default"}
                 variant={range === opt.id ? "solid" : "light"}
@@ -375,7 +365,8 @@ export default function History() {
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {NUTRIENTS.map((n) => {
-                if (!visibility[n.logicalKey]) return null;
+                if (!visibility[n.logicalKey as keyof typeof visibility])
+                  return null;
 
                 const avg = overviewAverages[n.dataKey] || 0;
                 const total = overviewTotals[n.dataKey] || 0;
@@ -472,7 +463,7 @@ export default function History() {
                     {NUTRIENTS.filter(
                       (n) =>
                         n.logicalKey !== "calories" &&
-                        visibility[n.logicalKey]
+                        visibility[n.logicalKey as keyof typeof visibility]
                     ).map((n) => {
                       const amount = totals[n.dataKey] || 0;
                       const percentDV = getDailyValuePercent(
@@ -521,7 +512,10 @@ export default function History() {
 
                           {/* Create a column for each visible nutrient */}
                           {NUTRIENTS.filter(
-                            (n) => visibility[n.logicalKey]
+                            (n) =>
+                              visibility[
+                                n.logicalKey as keyof typeof visibility
+                              ]
                           ).map((n) => (
                             <th
                               key={n.logicalKey}
@@ -559,7 +553,10 @@ export default function History() {
 
                               {/* Every visible nutrient is shown per food entry */}
                               {NUTRIENTS.filter(
-                                (n) => visibility[n.logicalKey]
+                                (n) =>
+                                  visibility[
+                                    n.logicalKey as keyof typeof visibility
+                                  ]
                               ).map((n) => (
                                 <td
                                   key={n.logicalKey}

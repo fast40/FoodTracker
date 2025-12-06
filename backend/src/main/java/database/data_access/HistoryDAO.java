@@ -51,10 +51,12 @@ public class HistoryDAO {
             stmt.setInt(4, limit);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
+                Integer logId = rs.getInt("log_id");
                 Integer foodID = rs.getInt("food_id");
                 Float quantity = rs.getFloat("quantity");
                 Timestamp date = rs.getTimestamp("log_date");
-                LogEntry entry = new LogEntry(date, quantity, foodID);
+                String mealType = rs.getString("meal_type");
+                LogEntry entry = new LogEntry(logId, date, foodID, quantity, mealType);
                 history.add(entry);
             }
         } catch (SQLException e) {
