@@ -13,9 +13,21 @@ import { PhotoScanView } from "@/components/photoScanView";
 // NOTE: added useEffect so we can read settings from localstorage
 import { useState, useEffect, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import { LoginForm } from "@/components/LoginForm";
+import { RegisterForm } from "@/components/RegisterForm";
 
 // button component from heroui
-import { Button, Input, Form } from "@heroui/react";
+import {
+  Button,
+  Input,
+  Form,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  useDisclosure,
+} from "@heroui/react";
 
 // *** new: storage key is the same as the one used in history/daygraph/settings ***
 const STORAGE_KEY = "nutrientVisibility";
@@ -78,6 +90,8 @@ function loadVisibilityFromStorage() {
 export default function AddFood() {
   // need a variable to navigate
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   // name of the food item the user is typing
   const [name, setName] = useState("");
@@ -101,6 +115,8 @@ export default function AddFood() {
 
   // toggle scanner visibility
   const [showScanner, setShowScanner] = useState(false);
+
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
 
   // *** new: on mount, read the latest settings from localstorage ***
   useEffect(() => {
@@ -179,6 +195,12 @@ export default function AddFood() {
   async function handleSubmit(e: FormEvent) {
     // stop the browser from reloading the page and losing progress
     e.preventDefault();
+
+    if (!user) {
+      onOpen();
+      return;
+    }
+
     setError(null);
     setSaving(true);
 
@@ -298,7 +320,7 @@ export default function AddFood() {
             {/* cancel just goes back to the dashboard without saving */}
             <Button
               variant="bordered"
-              onPress={() => navigate("/dashboard")}
+              onPress={() => navigate(user ? "/dashboard" : "/")}
               disabled={saving}
             >
               cancel
@@ -315,6 +337,37 @@ export default function AddFood() {
             </Button>
           </div>
         </Form>
+
+        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  {authMode === "login" ? "Login" : "Register"}
+                </ModalHeader>
+                <ModalBody>
+                  {authMode === "login" ? (
+                    <LoginForm onSuccess={onClose} />
+                  ) : (
+                    <RegisterForm onSuccess={onClose} />
+                  )}
+                  <div className="flex justify-center mt-2">
+                    <Button
+                      variant="light"
+                      onPress={() =>
+                        setAuthMode(authMode === "login" ? "register" : "login")
+                      }
+                    >
+                      {authMode === "login"
+                        ? "Need an account? Register"
+                        : "Have an account? Login"}
+                    </Button>
+                  </div>
+                </ModalBody>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
       </section>
     </DefaultLayout>
   );
