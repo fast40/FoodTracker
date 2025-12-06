@@ -7,7 +7,7 @@ import java.sql.*;
 
 public class UserDAO {
     public User getUserByUsername(String username) {
-        String query = "SELECT id, username, email, dark_mode, notifications_enabled, language_code, show_calories, daily_calorie_goal, created_at FROM users WHERE username = ?";
+        String query = "SELECT user_id, username, email, dark_mode, notifications_enabled, language_code, show_calories, daily_calorie_goal, created_at FROM users WHERE username = ?";
 
         try (
             Connection connection = DatabaseConnection.getConnection();
@@ -22,7 +22,7 @@ public class UserDAO {
             }
 
             return new User(
-                resultSet.getInt("id"),
+                resultSet.getInt("user_id"),
                 resultSet.getString("username"),
                 resultSet.getString("email"),
                 resultSet.getBoolean("dark_mode"),

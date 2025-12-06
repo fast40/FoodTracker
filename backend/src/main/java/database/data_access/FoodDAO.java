@@ -1,6 +1,5 @@
 package database.data_access;
 
-import database.helpers.Enumerations;
 import database.helpers.Enumerations.NutrientType;
 import database.wrappers.FoodItem;
 import database.wrappers.Nutrient;

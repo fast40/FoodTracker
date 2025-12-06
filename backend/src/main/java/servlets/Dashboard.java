@@ -2,8 +2,11 @@ package servlets;
 
 import database.data_access.FoodDAO;
 import database.data_access.HistoryDAO;
+import database.data_access.UserDAO;
 import database.data_transfer.DailyFoodLog;
 import database.data_transfer.LogEntry;
+import database.data_transfer.User;
+import database.helpers.RequestJsonParser;
 import database.wrappers.FoodItem;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,6 +16,7 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.Principal;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.sql.Timestamp;
@@ -26,7 +30,6 @@ import com.google.gson.JsonObject;
 public class Dashboard extends HttpServlet {
     final String startRequest = "startDate";
     final String endRequest = "endDate";
-    final String userIDRequest = "userID";
     final String entryLimitRequest = "entryLimit";
     final String timezoneRequest = "timezone";
 
@@ -34,12 +37,30 @@ public class Dashboard extends HttpServlet {
     private HistoryDAO historyDAO = new HistoryDAO();
     private FoodDAO foodDAO = new FoodDAO();
 
+    private record RequestData (String startDate, String endDate, String timezone) {}
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET");
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Principal principal = request.getUserPrincipal();
+
+        if (principal == null) {
+                System.out.println("tried to add food with no user logged in"); 
+
+                response.setContentType("application/json");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write(gson.toJson(Map.of("message", "no user logged in")));
+
+                return;
+        }
+
+        UserDAO userDAO = new UserDAO();
+        User user = userDAO.getUserByUsername(principal.getName());
+        // response.setHeader("Access-Control-Allow-Origin", "*");
+        // response.setHeader("Access-Control-Allow-Methods", "GET");
+        // response.setContentType("application/json");
+        // response.setCharacterEncoding("UTF-8");
+
+        RequestData requestData = RequestJsonParser.parse(request, RequestData.class);
 
         PrintWriter out = response.getWriter();
 
@@ -57,8 +78,8 @@ public class Dashboard extends HttpServlet {
         // this should be the default
 
         // query database for data
-        String iso_start = request.getParameter(startRequest);
-        String iso_end = request.getParameter(endRequest);
+        String iso_start = requestData.startDate();
+        String iso_end = requestData.endDate();
 
         Instant instant = Instant.parse(iso_start);
         Timestamp mysql_start = Timestamp.from(instant);
@@ -66,17 +87,15 @@ public class Dashboard extends HttpServlet {
         instant = Instant.parse(iso_end);
         Timestamp mysql_end = Timestamp.from(instant);
 
-        Integer userID = Integer.parseInt(request.getParameter(userIDRequest));
-
-        String limitParam = request.getParameter(entryLimitRequest);
-        String tzParam = request.getParameter(timezoneRequest);
+        String limitParam = null; // the frontend was never sending this anyway; this can be a todo item if it actually matters
+        String tzParam = requestData.timezone();
         ZoneId userZone = (tzParam != null) ? ZoneId.of(tzParam) : ZoneId.of("UTC");
 
         List<LogEntry> history;
         Integer entryLimit = (limitParam != null) ? Integer.parseInt(limitParam) : 100;
         try {
             //get a log of all the foodIDs within the range
-            history = historyDAO.GetHistory(userID, mysql_start, mysql_end, entryLimit);
+            history = historyDAO.GetHistory(user.id(), mysql_start, mysql_end, entryLimit);
             Map<LocalDate, DailyFoodLog> dailyFoodLog = new LinkedHashMap<>();
 
             //for each foodID, get the associated FoodItem
@@ -88,6 +107,7 @@ public class Dashboard extends HttpServlet {
 
             List<DailyFoodLog> dailyHistory = new ArrayList<>(dailyFoodLog.values());
             String json = gson.toJson(dailyHistory);
+            System.out.printf("json: %s", json);
             out.write(json);        
 
         } catch (SQLException e) {

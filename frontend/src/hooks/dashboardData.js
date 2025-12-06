@@ -14,17 +14,16 @@ export function useRangeData(start, end) {
 
     async function load() {
       try {
-
-        //get current userid
-
-        const params = new URLSearchParams({
-          startDate,
-          endDate,
-          userID: 456, //TODO: get actual user data - wait for Advait's user servlet?
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        const res = await fetch("http://localhost:8080/food-tracker/api/dashboard", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            startDate,
+            endDate,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, 
+          })
         });
-
-        const res = await fetch(`http://localhost:8080/food-tracker/api/dashboard?${params.toString()}`);
         if (!res.ok)
           throw new Error("Request failed");
 

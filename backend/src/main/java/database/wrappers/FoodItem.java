@@ -3,6 +3,8 @@ package database.wrappers;
 import java.util.ArrayList;
 import java.util.List;
 
+// public record FoodItem (int foodId, String name, List<Nutrient> nutrients) {}
+
 public class FoodItem {
     private Integer foodId; // Database ID
     private Integer fdcId; // USDA ID
