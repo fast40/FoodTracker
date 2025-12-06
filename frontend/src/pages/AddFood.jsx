@@ -184,7 +184,7 @@ export default function AddFood() {
             marginBottom: "1rem",
           }}
         >
-          add food
+          Add food
         </h1>
 
         {/* error message */}
