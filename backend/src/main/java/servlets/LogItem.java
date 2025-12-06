@@ -1,16 +1,11 @@
 package servlets;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,17 +16,32 @@ import database.data_access.HistoryDAO;
 import database.data_access.UserDAO;
 import database.data_transfer.User;
 import database.helpers.Enumerations;
-import database.helpers.RequestJsonParser;
 import database.helpers.Enumerations.NutrientType;
+import database.helpers.RequestJsonParser;
 import database.wrappers.FoodItem;
 import database.wrappers.Nutrient;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/api/log-item")
 public class LogItem extends HttpServlet {
         Gson gson = new Gson();
 
-        private final record FoodEntry(String name, float servings, Nutrients nutrients) { }
-        private final record Nutrients(int energy_kcal, int protein_g, int carbs_g, int fat_g, int fiber_g, int sodium_mg, int sugars_g) { }
+        private final record FoodEntry(String name, float servings, Map<String, Float> nutrients) { }
+        
+        private static final Map<String, NutrientType> NUTRIENT_KEY_MAP = new HashMap<>();
+        static {
+            NUTRIENT_KEY_MAP.put("energy_kcal", NutrientType.ENERGY);
+            NUTRIENT_KEY_MAP.put("protein_g", NutrientType.PROTEIN);
+            NUTRIENT_KEY_MAP.put("carbs_g", NutrientType.CARBOHYDRATE);
+            NUTRIENT_KEY_MAP.put("fat_g", NutrientType.TOTAL_FAT);
+            NUTRIENT_KEY_MAP.put("fiber_g", NutrientType.FIBER);
+            NUTRIENT_KEY_MAP.put("sodium_mg", NutrientType.SODIUM);
+            NUTRIENT_KEY_MAP.put("sugars_g", NutrientType.SUGARS_TOTAL);
+        }
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -70,13 +80,16 @@ public class LogItem extends HttpServlet {
                 foodItem.setServingSize(1.0f);
                 foodItem.setServingSizeUnit(foodEntry.name());
                 foodItem.setHouseholdServingFullText("1 " + foodEntry.name());
-                nutrients.add(new Nutrient(NutrientType.ENERGY, foodEntry.nutrients.energy_kcal()));
-                nutrients.add(new Nutrient(NutrientType.PROTEIN, foodEntry.nutrients.protein_g()));
-                nutrients.add(new Nutrient(NutrientType.CARBOHYDRATE, foodEntry.nutrients.carbs_g()));
-                nutrients.add(new Nutrient(NutrientType.TOTAL_FAT, foodEntry.nutrients.fat_g()));
-                nutrients.add(new Nutrient(NutrientType.FIBER, foodEntry.nutrients.fiber_g()));
-                nutrients.add(new Nutrient(NutrientType.SODIUM, foodEntry.nutrients.sodium_mg()));
-                nutrients.add(new Nutrient(NutrientType.SUGARS_TOTAL, foodEntry.nutrients.sugars_g()));
+                
+                if (foodEntry.nutrients() != null) {
+                    for (Map.Entry<String, Float> entry : foodEntry.nutrients().entrySet()) {
+                        NutrientType type = NUTRIENT_KEY_MAP.get(entry.getKey());
+                        if (type != null && entry.getValue() != null) {
+                            nutrients.add(new Nutrient(type, entry.getValue()));
+                        }
+                    }
+                }
+                
                 foodItem.setNutrients(nutrients);
 
                 System.out.println("Description: " + foodItem.getDescription());
