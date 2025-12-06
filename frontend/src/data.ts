@@ -91,12 +91,25 @@ export const DEFAULT_VISIBILITY = NUTRIENT_DEFINITIONS.reduce(
   {} as Record<string, boolean>
 );
 
+// old
+// export const PALETTE = [
+//   "#7471b3ff",
+//   "#313d85ff",
+//   "#4e9cb1ff",
+//   "#6bd1a5ff",
+//   "#60a344ff",
+//   "#be916eff",
+//   "#7a4628ff",
+// ];
+
 export const PALETTE = [
-  "#7471b3ff",
-  "#313d85ff",
-  "#4e9cb1ff",
-  "#6bd1a5ff",
-  "#60a344ff",
-  "#be916eff",
-  "#7a4628ff",
+  "#bf616a",
+  "#d08770",
+  "#ebcb8b",
+  "#a3be8c",
+  "#b48ead",
+  "#8fbcbb",
+  "#88c0d0",
+  "#81a1c1",
+  "#5e81ac",
 ];
