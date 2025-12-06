@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { BrowserMultiFormatReader } from "@zxing/browser";
 
-let reader = null;
+let reader: BrowserMultiFormatReader | null = null;
 
 function getReader() {
   if (!reader) {
@@ -11,7 +11,7 @@ function getReader() {
 }
 
 export const zxingImageScanner = {
-  async decode(file) {
+  async decode(file: File) {
     const url = URL.createObjectURL(file);
 
     try {
@@ -19,11 +19,7 @@ export const zxingImageScanner = {
 
       if (!result) return null;
 
-      if (typeof result.getText === "function") {
-        return result.getText() || null;
-      }
-
-      return result.text || null;
+      return result.getText() || null;
     } catch (e) {
       return null;
     } finally {

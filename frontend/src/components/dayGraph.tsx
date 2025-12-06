@@ -1,5 +1,5 @@
 import { useRangeData } from "@/hooks/dashboardData";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Button, DatePicker } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
 import { parseDate } from "@internationalized/date";
@@ -29,7 +29,7 @@ function loadVisibility() {
   }
 }
 
-function addDays(start, n) {
+function addDays(start: string | Date, n: number) {
   const d = new Date(start);
   d.setDate(d.getDate() + n);
   return d.toISOString();
@@ -48,7 +48,7 @@ export function DayGraph({
   // Get nutrient data via the dashboardData hook
   const rawData = useRangeData(startDate, endDate);
   //console.log(JSON.stringify(rawData, null, 2));
-  const day = rawData ? rawData[0] : [];
+  const day = rawData ? rawData[0] : undefined;
   const entries = day ? day.foods : [];
 
   const navigate = useNavigate();
@@ -63,11 +63,10 @@ export function DayGraph({
     return filtered.map((n) => ({ id: n.id, label: n.label }));
   }, []);
 
-  const foods = (entries || []).map((e, i) => ({
+  const foods = (entries || []).map((e: any, i: number) => ({
     id: e.food.foodId || String(i),
     name: e.food.description,
   }));
-
   const foodsSorted = [...foods]
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((f, idx) => ({
@@ -77,18 +76,21 @@ export function DayGraph({
 
   // Build stacked data rows: one row per nutrient, columns per food id with %DV values
   const data = useMemo(() => {
-    const rows = nutrients.map((n) => ({ name: n.label, nutrientId: n.id }));
-    (entries || []).map((e, i) => {
+    const rows: any[] = nutrients.map((n) => ({
+      name: n.label,
+      nutrientId: n.id,
+    }));
+    (entries || []).map((e: any, i: number) => {
       const foodId = foods[i]?.id;
       if (!foodId) return;
       const factor = e.quantity ?? 1;
 
       nutrients.forEach((n) => {
         const nutrient = e.food.nutrients?.find(
-          (nut) => nut.nutrientId === n.id
+          (nut: any) => nut.nutrientId === n.id
         );
         const abs = (nutrient?.amount || 0) * factor;
-        const dv = DEFAULT_DV[n.id] || 0;
+        const dv = DEFAULT_DV[n.id as keyof typeof DEFAULT_DV] || 0;
         const uncappedPct = dv ? Math.max(0, (abs / dv) * 100) : 0;
         const pct = Math.min(100, uncappedPct);
         const row = rows.find((r) => r.nutrientId === n.id) || {};
@@ -98,21 +100,21 @@ export function DayGraph({
       });
     });
     return rows;
-  }, [entries, nutrients, foods]);
-
-  // Tooltip: show absolute values with units for the hovered nutrient
-  function ValueTooltip({ active, payload, label }) {
+  }, [entries, nutrients, foods]); // Tooltip: show absolute values with units for the hovered nutrient
+  function ValueTooltip({ active, payload, label }: any) {
     if (!active || !payload?.length) return null;
     const row = data.find((d) => d.name === label);
     const nutrientId = row?.nutrientId;
-    const unit = nutrientId ? UNITS[nutrientId] || "" : "";
+    const unit = nutrientId
+      ? UNITS[nutrientId as keyof typeof UNITS] || ""
+      : "";
     return (
       <div className="rounded-medium border bg-background p-2 text-sm">
         <div className="font-medium mb-1">{label}</div>
-        {payload.map((p) => {
+        {payload.map((p: any) => {
           const foodId = p.dataKey;
           const abs = p?.payload?.[`${foodId}__abs`] ?? 0;
-          const food = foods.find((f) => f.id === foodId);
+          const food = foods.find((f: any) => f.id === foodId);
           return (
             <div key={foodId} className="flex items-center gap-2">
               <span
@@ -131,7 +133,7 @@ export function DayGraph({
     );
   }
 
-  function CustomLegend({ payload }) {
+  function CustomLegend({ payload }: any) {
     return (
       <div
         style={{
@@ -142,7 +144,7 @@ export function DayGraph({
           marginLeft: "120px",
         }}
       >
-        {payload.map((entry) => (
+        {payload.map((entry: any) => (
           <div
             key={entry.value}
             style={{
@@ -167,20 +169,20 @@ export function DayGraph({
     );
   }
 
-  const formatWeekday = (yyyyMmDd) => {
+  const formatWeekday = (yyyyMmDd: string) => {
     if (!yyyyMmDd) return "";
     const [y, m, d] = yyyyMmDd.split("-").map(Number);
     const dt = new Date(y, m - 1, d); // local date (avoids UTC offset issues)
     return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(dt);
   };
 
-  function formatDay(iso) {
+  function formatDay(iso: string) {
     const d = new Date(iso);
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   }
 
   //Bool to determine whether reference line is drawn at 100%
-  const anyOver100 = data.some((r) => (r.totalPctUncapped || 0) > 100);
+  const anyOver100 = data.some((r: any) => (r.totalPctUncapped || 0) > 100);
 
   return (
     <section className="flex flex-col gap-6 mt-10">

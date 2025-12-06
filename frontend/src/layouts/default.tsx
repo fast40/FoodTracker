@@ -1,6 +1,7 @@
+import { ReactNode } from "react";
 import { Navbar } from "@/components/navbar";
 
-export default function DefaultLayout({ children }) {
+export default function DefaultLayout({ children }: { children: ReactNode }) {
   return (
     //Full-page wrapper with app background
     <div className="min-h-screen flex flex-col bg-background text-foreground">

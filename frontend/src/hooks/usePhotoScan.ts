@@ -2,12 +2,12 @@ import { useCallback, useState } from "react";
 import { zxingImageScanner } from "../services/adapters/scanner/zxing";
 
 export function usePhotoScan(scanner = zxingImageScanner) {
-  const [upc, setUpc] = useState(null);
-  const [error, setError] = useState(null);
+  const [upc, setUpc] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
 
   const scanFile = useCallback(
-    async (file) => {
+    async (file: File) => {
       setError(null);
       setIsScanning(true);
 
@@ -26,7 +26,7 @@ export function usePhotoScan(scanner = zxingImageScanner) {
         }
 
         return code;
-      } catch (e) {
+      } catch (e: any) {
         setError((e && e.message) || "Failed to scan image.");
         setUpc(null);
         return null;

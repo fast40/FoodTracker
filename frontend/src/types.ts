@@ -22,10 +22,9 @@ export interface FoodItem {
 // Current API Response Structure
 export interface DailyFoodLog {
   date: string;
-  foods: FoodItem[];
+  foods: FoodLogEntry[];
 }
 
-// Future/Ideal Structure (Not yet returned by API)
 export interface FoodLogEntry {
   logId: number;
   food: FoodItem;

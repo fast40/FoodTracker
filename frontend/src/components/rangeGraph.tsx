@@ -1,5 +1,5 @@
 import { useRangeData } from "@/hooks/dashboardData";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Button, DatePicker } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
 import { parseDate } from "@internationalized/date";
@@ -29,7 +29,7 @@ function loadVisibility() {
   }
 }
 
-function addDays(start, n) {
+function addDays(start: string | Date, n: number) {
   const d = new Date(start);
   d.setDate(d.getDate() + n);
   return d.toISOString();
@@ -81,7 +81,7 @@ export function RangeGraph({
 
   const data = useMemo(() => {
     // build lookup by local date string "YYYY-MM-DD"
-    const lookup = (days || []).reduce((acc, d) => {
+    const lookup = (days || []).reduce((acc: Record<string, any>, d) => {
       const key =
         d.date?.slice(0, 10) ?? new Date(d.date).toISOString().slice(0, 10);
       acc[key] = d;
@@ -91,7 +91,7 @@ export function RangeGraph({
     return weekLocalDates.map((dateStr) => {
       const day = lookup[dateStr] || { date: dateStr, foods: [] };
 
-      const totals = nutrients.reduce((acc, n) => {
+      const totals = nutrients.reduce((acc: Record<string, number>, n) => {
         acc[n.id] = 0;
         return acc;
       }, {});
@@ -99,16 +99,16 @@ export function RangeGraph({
         for (const n of nutrients) {
           const factor = entry.quantity ?? 1;
           const nutrient = entry.food.nutrients?.find(
-            (nut) => nut.nutrientId === n.id
+            (nut: any) => nut.nutrientId === n.id
           );
           totals[n.id] += (nutrient?.amount || 0) * factor;
         }
       }
 
       const hasData = day.foods && day.foods.length > 0;
-      const dvPercents = {};
+      const dvPercents: Record<string, number | null> = {};
       for (const n of nutrients) {
-        const dv = DEFAULT_DV[n.id] ?? 1;
+        const dv = DEFAULT_DV[n.id as keyof typeof DEFAULT_DV] ?? 1;
         // if the day has no data, set null so Recharts will break the line
         if (!hasData) {
           dvPercents[n.id] = null;
@@ -122,15 +122,15 @@ export function RangeGraph({
     });
   }, [days, nutrients, weekLocalDates]);
 
-  function ValueTooltip({ active, payload, label }) {
+  function ValueTooltip({ active, payload, label }: any) {
     if (!active || !payload?.length) return null;
-    const sorted = [...payload].sort((a, b) => b.value - a.value);
+    const sorted = [...payload].sort((a: any, b: any) => b.value - a.value);
     return (
       <div className="rounded-medium border bg-background p-2 text-sm">
         <div className="font-medium mb-1">
           {formatWeekday(label)} ({label.slice(5, 10)})
         </div>
-        {sorted.map((p) => (
+        {sorted.map((p: any) => (
           <div key={p.dataKey} className="flex items-center gap-2">
             <span
               className="inline-block h-3 w-3 rounded-sm"
@@ -144,7 +144,7 @@ export function RangeGraph({
     );
   }
 
-  function CustomLegend({ payload }) {
+  function CustomLegend({ payload }: any) {
     return (
       <div
         style={{
@@ -155,7 +155,7 @@ export function RangeGraph({
           marginLeft: "120px",
         }}
       >
-        {payload.map((entry) => (
+        {payload.map((entry: any) => (
           <div
             key={entry.value}
             style={{
@@ -180,21 +180,21 @@ export function RangeGraph({
     );
   }
 
-  const formatWeekday = (yyyyMmDd) => {
+  const formatWeekday = (yyyyMmDd: string) => {
     if (!yyyyMmDd) return "";
     const [y, m, d] = yyyyMmDd.split("-").map(Number);
     const dt = new Date(y, m - 1, d); // local date (avoids UTC offset issues)
     return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(dt);
   };
 
-  function formatDay(iso) {
+  function formatDay(iso: string) {
     const d = new Date(iso);
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   }
 
   //Bool to determine whether reference line is drawn at 100%
   const anyOver100 = data.some((entry) =>
-    Object.values(entry).some((v) => v > 100)
+    Object.values(entry).some((v) => typeof v === "number" && v > 100)
   );
 
   return (

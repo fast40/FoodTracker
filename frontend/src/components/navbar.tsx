@@ -35,7 +35,7 @@ export const Navbar = () => {
         <NavbarBrand className="gap-3 max-w-fit">
           <Link
             className="flex justify-start items-center gap-1"
-            color="white"
+            color="foreground"
             href="/"
           >
             {/* <Logo /> */}
@@ -53,10 +53,10 @@ export const Navbar = () => {
               <NavbarItem key={item.href}>
                 <Link
                   className={clsx(
-                    linkStyles({ color: "white" }),
+                    linkStyles({ color: "foreground" }),
                     "data-[active=true]:text-primary data-[active=true]:font-medium"
                   )}
-                  color="white"
+                  color="foreground"
                   href={item.href}
                 >
                   {item.label}
@@ -75,10 +75,10 @@ export const Navbar = () => {
               <NavbarItem key={item.href}>
                 <Link
                   className={clsx(
-                    linkStyles({ color: "white" }),
+                    linkStyles({ color: "foreground" }),
                     "data-[active=true]:text-primary data-[active=true]:font-medium"
                   )}
-                  color="white"
+                  color="foreground"
                   href={item.href}
                 >
                   {item.label}
@@ -96,7 +96,7 @@ export const Navbar = () => {
           })
           .map((item) => (
             <NavbarMenuItem key={item.href} onClick={() => setMenuOpen(false)}>
-              <Link href={item.href} color="white">
+              <Link href={item.href} color="foreground">
                 {item.label}
               </Link>
             </NavbarMenuItem>

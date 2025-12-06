@@ -10,27 +10,24 @@ import DefaultLayout from "@/layouts/default";
 
 // react hooks for local state + navigation
 // NOTE: added useEffect so we can read settings from localstorage
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 // button component from heroui
 import { Button } from "@heroui/react";
-
-// units map so user can label the inputs with (g, mg, kcal…)
-import { UNITS } from "@/data";
 
 // *** new: storage key is the same as the one used in history/daygraph/settings ***
 const STORAGE_KEY = "nutrientVisibility";
 
 // nutrients the user can type in on this form (should be the same in all files)
 const NUTRIENT_FIELDS = [
-  { key: "energy_kcal", label: "Calories" },
-  { key: "protein_g", label: "Protein" },
-  { key: "carbs_g", label: "Carbs" },
-  { key: "fat_g", label: "Fat" },
-  { key: "fiber_g", label: "Fiber" },
-  { key: "sodium_mg", label: "Sodium" },
-  { key: "sugars_g", label: "Sugars" },
+  { key: "energy_kcal", label: "Calories", unit: "kcal" },
+  { key: "protein_g", label: "Protein", unit: "g" },
+  { key: "carbs_g", label: "Carbs", unit: "g" },
+  { key: "fat_g", label: "Fat", unit: "g" },
+  { key: "fiber_g", label: "Fiber", unit: "g" },
+  { key: "sodium_mg", label: "Sodium", unit: "mg" },
+  { key: "sugars_g", label: "Sugars", unit: "g" },
 ];
 
 // *** new: map between the nutrient keys and the logical keys used in settings ***
@@ -99,7 +96,7 @@ export default function AddFood() {
   // true while the request is in flight
   const [saving, setSaving] = useState(false);
   // error message if something went wrong
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // *** new: on mount, read the latest settings from localstorage ***
   useEffect(() => {
@@ -108,23 +105,24 @@ export default function AddFood() {
   }, []);
 
   // helper: update one nutrient field in state
-  function handleNutrientChange(key, value) {
+  function handleNutrientChange(key: string, value: string) {
     setNutrients((prev) => ({ ...prev, [key]: value }));
   }
 
   // *** new: choose which nutrient fields to actually render based on settings ***
   // if a nutrient's logical key is turned off in settings, we hide that input
   const visibleFields = NUTRIENT_FIELDS.filter((field) => {
-    const logicalKey = FIELD_TO_SETTINGS_KEY[field.key];
+    const logicalKey =
+      FIELD_TO_SETTINGS_KEY[field.key as keyof typeof FIELD_TO_SETTINGS_KEY];
     if (!logicalKey) return true; // if mapping missing, show it rather than hiding
 
-    const flag = visibility[logicalKey];
+    const flag = visibility[logicalKey as keyof typeof visibility];
     // follow same behavior as graphs: undefined means "on"
     return flag === undefined ? true : !!flag;
   });
 
   // handle form submit --> save food button
-  async function handleSubmit(e) {
+  async function handleSubmit(e: FormEvent) {
     // stop the browser from reloading the page and losing progress
     e.preventDefault();
     setError(null);
@@ -132,7 +130,7 @@ export default function AddFood() {
 
     try {
       // build the payload that we will send to the backend
-      const payload = {
+      const payload: any = {
         name,
         servings: Number(servings) || 1,
         nutrients: {},
@@ -142,7 +140,7 @@ export default function AddFood() {
       // note: we loop over all fields, not just visibleFields,
       // so settings affect the ui only, not the json structure
       for (const field of NUTRIENT_FIELDS) {
-        const raw = nutrients[field.key];
+        const raw = nutrients[field.key as keyof typeof nutrients];
         if (raw !== "" && !isNaN(Number(raw))) {
           payload.nutrients[field.key] = Number(raw);
         }
@@ -275,7 +273,7 @@ export default function AddFood() {
                 }}
               >
                 <label style={{ fontSize: "0.9rem" }}>
-                  {field.label} ({UNITS[field.key] || ""})
+                  {field.label} ({field.unit})
                 </label>
                 <input
                   type="number"

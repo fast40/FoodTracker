@@ -3,14 +3,14 @@ import { useCallback, useRef, useState } from "react";
 import { Button } from "@heroui/react";
 import { usePhotoScan } from "@/hooks/usePhotoScan";
 
-export function PhotoScanView({ onCode }) {
+export function PhotoScanView({ onCode }: { onCode: (code: string) => void }) {
   const { isScanning, error, scanFile } = usePhotoScan();
   const [dragOver, setDragOver] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const inputRef = useRef(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(
-    async (file) => {
+    async (file: File | undefined) => {
       if (!file) return;
       try {
         if (previewUrl) URL.revokeObjectURL(previewUrl);

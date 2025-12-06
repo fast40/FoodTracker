@@ -34,7 +34,7 @@ export function useRangeData(start: string | Date, end: string | Date) {
 
         const json: DailyFoodLog[] = await res.json();
         setData(json);
-      } catch (err) {
+      } catch (err: any) {
         console.log("ERROR fetching from /api/dashboard: " + err.message);
       }
     }
