@@ -1,6 +1,14 @@
 import { useState } from "react";
 import DefaultLayout from "@/layouts/default";
-import { Button } from "@heroui/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardFooter,
+  Switch,
+  Divider,
+} from "@heroui/react";
 import { NUTRIENT_DEFINITIONS, STORAGE_KEY, DEFAULT_VISIBILITY } from "@/data";
 
 type Visibility = Record<string, boolean>;
@@ -55,68 +63,57 @@ export default function Settings() {
       );
     }
     setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
   };
 
   return (
     <DefaultLayout>
-      <div className="flex flex-col gap-6 max-w-2xl mx-auto py-6">
-        <h1 className="text-2xl font-semibold">Settings</h1>
-        <p className="text-sm text-default-500">
-          Choose which nutrients you want to see across your entries and graphs.
-        </p>
+      <div className="max-w-2xl mx-auto py-6">
+        <Card className="w-full">
+          <CardHeader className="flex flex-col items-start px-6 pt-6 pb-0">
+            <h1 className="text-2xl font-semibold">Settings</h1>
+            <p className="text-small text-default-500 mt-1">
+              Choose which nutrients you want to see across your entries and
+              graphs.
+            </p>
+          </CardHeader>
 
-        <div className="flex gap-3">
-          <Button size="sm" variant="flat" onClick={selectAll}>
-            Select All
-          </Button>
-          <Button size="sm" variant="flat" onClick={clearAll}>
-            Hide All
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {NUTRIENT_DEFINITIONS.map((n) => (
-            <div
-              key={n.settingsKey}
-              className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-default-100"
-              onClick={() => toggleNutrient(n.settingsKey)}
-            >
-              <span>{n.label}</span>
-              <div
-                className={`w-5 h-5 rounded-full border ${
-                  visibleNutrients[n.settingsKey]
-                    ? "bg-primary border-primary"
-                    : "border-default-400"
-                }`}
-              >
-                {visibleNutrients[n.settingsKey] && (
-                  <svg
-                    className="w-full h-full text-white p-0.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={3}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                )}
-              </div>
+          <CardBody className="px-6 py-6 gap-6">
+            <div className="flex gap-3">
+              <Button size="sm" variant="flat" onPress={selectAll}>
+                Select All
+              </Button>
+              <Button size="sm" variant="flat" onPress={clearAll}>
+                Hide All
+              </Button>
             </div>
-          ))}
-        </div>
 
-        <div className="flex items-center justify-end gap-3">
-          {saved && (
-            <span className="text-sm text-emerald-400">Preferences saved</span>
-          )}
-          <Button color="primary" onClick={handleSave}>
-            Save Preferences
-          </Button>
-        </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {NUTRIENT_DEFINITIONS.map((n) => (
+                <Switch
+                  key={n.settingsKey}
+                  isSelected={visibleNutrients[n.settingsKey]}
+                  onValueChange={() => toggleNutrient(n.settingsKey)}
+                >
+                  {n.label}
+                </Switch>
+              ))}
+            </div>
+          </CardBody>
+
+          <Divider />
+
+          <CardFooter className="flex justify-end gap-4 px-6 py-4">
+            {saved && (
+              <span className="text-sm text-success animate-appearance-in">
+                Preferences saved
+              </span>
+            )}
+            <Button color="primary" onPress={handleSave}>
+              Save Preferences
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
     </DefaultLayout>
   );
