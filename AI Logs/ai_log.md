@@ -158,3 +158,23 @@ issue/fix 2: the code provided by the AI also used doubles where the rest of the
 
 explanation: I was able to iterate with the AI to slightly change what I was originally trying to do and generate code that I understood well. However, the AI didn't have full knowledge of the codebase and tried to use methods that weren't there and incorrect datatypes. These errors were fairly simple, so I just manually created the infrastructure that it was expecting and fixed the small mistakes that it made.
 
+--------------------------------------------------
+
+AI Tools Used: ChatGPT
+
+I used ChatGPT to help design and implement the nutrient visibility settings feature, specifically the settings page UI, the toggle logic, and the filtering functionality that updates the Day and Week dashboards. I also used it while integrating a peer’s barcode-scanner feature into our updated JavaScript tech stack.
+
+Issues:
+The AI suggested a visibility object structure that didn’t match our existing nutrient constants.
+
+It omitted proper localStorage handling, which would have caused missing or corrupted settings.
+
+Some generated code referenced helper functions that didn’t exist.
+
+The barcode example assumed a backend workflow that didn’t fit our client-side design.
+
+Fixes:
+I rewrote the visibility model to match our data shape, added safe merging/fallback logic when loading preferences, and corrected the toggle + filtering logic so dashboards update reliably. For the scanner, I rebuilt the AI’s example to work with our browser upload flow and preserved functionality from the original implementation.
+
+Explanation:
+The settings feature affects every part of the nutrition dashboard, so aligning the AI’s suggestions with our real codebase was crucial. AI provided a useful starting structure, but I refined and corrected the details to ensure stable behavior and full integration with the rest of the app.
