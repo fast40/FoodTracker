@@ -1,23 +1,29 @@
+--------------------------------------------------
+(Sidney (Ney) Cha 4522556505)
 AI Tools Used:
 > Claude
 
 General Uses:
 > Asking for general advice for java specific implementation details
     > ex. Using Records as a DTO (Data Transfer Object) in place of C++ structs
+> Asked for automations of extremely tedious tasks
+    > ex. Write me an enumeration for 
 
 Specific Prompts
 > As the implementation surrounding Users is work in progress from a different contributor
-> could you help me finish this temporary test java class that generates test foodItems, and
-> foodLogs and adds them to the SQL database. I have attached my current skeleton code, 
-> data access objects (DAOs), and wrapper classes.
+  could you help me finish this temporary test java class that generates test foodItems, and
+  foodLogs and adds them to the SQL database. I have attached my current skeleton code, 
+  data access objects (DAOs), and wrapper classes.
     > Attached FoodDAO
     > Attached HistoryDAO
     > Attached Setup.sql
     > Attached FoodItem (Wrapper)
     > Attached FoodLog (Wrapper)
     > Attached Dashboard (Servlet)
+> Write me an enumeration for every possible nutrient type based on the java wrapper files
+  I posted earlier, the sql schema, and the USDA food API.
 
-
+Other than automation or tedious tasks, and advice on specific data structures/design structure everything was hand written using previous assignments as reference.
 --------------------------------------------------
 
 In order to ensure that the copilot's generation is aligned with the API documentation, I copied the USDA food API schema from their OpenAPI documentation into `docs/`, and attached it in a conversation with copilot. I sent the following propmt together:
