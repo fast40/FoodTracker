@@ -184,3 +184,16 @@ I rewrote the visibility model to match our data shape, added safe merging/fallb
 
 Explanation:
 The settings feature affects every part of the nutrition dashboard, so aligning the AI’s suggestions with our real codebase was crucial. AI provided a useful starting structure, but I refined and corrected the details to ensure stable behavior and full integration with the rest of the app.
+
+--------------------------------------------------
+
+AI Tools Used: None
+
+Issues:
+I didn't use AI in my contributions to this project. One of the issues I fixed was connecting the frontend and backend implementations of the scanning feature.
+
+Fixes:
+After retrieving the GTIN number from the function in usePhotoScan.ts, I wrote the HTTP GET request to get the JSON food data about the scanned barcode back to the frontend. The request sent the GTIN number (or UPC number) to the Java Servlet on the backend. Then, the servlet called the USDA Food API through the USDAFoodAPI.java file. This file contained many helper functions to get data from the API. The servlet called the function to get a Food item (returned as an instance of the FoodItem class). This instance of FoodItem was then converted into a JSON object (using the GSON library) and sent back to the frontend as a response to the HTTP request.
+
+Explanation:
+First, I ensured that the GTIN number was properly returned by the scanner on the frontend. File upload was already functional but no implementation after that was completed. In order to make the scanning feature functional, the frontend had to get the GTIN number from the image, send it to the backend, get the data from the USDA Food API on the backend, and finally, send it back to the frontend in the form of a JSON object. I did this using an HTTP GET request to the servlet and the USDAFoodAPI.java file (as mentioned earlier).
